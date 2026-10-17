@@ -11,3 +11,9 @@ __pycache__/
 
 .DS_Store
 
+
+# Local SQLite database
+backend/data/
+
+.venv/
+node_modules/

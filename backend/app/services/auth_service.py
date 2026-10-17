@@ -1,9 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.categories import DEFAULT_CATEGORIES
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.user import User
-from app.repositories import user_repository
+from app.repositories import category_repository, user_repository
 
 
 def register(db: Session, name: str, email: str, password: str, currency: str) -> User:
@@ -16,7 +17,12 @@ def register(db: Session, name: str, email: str, password: str, currency: str) -
         )
 
     hashed = hash_password(password)
-    return user_repository.create(db, name=name, email=email, password_hash=hashed, currency=currency)
+    user = user_repository.create(db, name=name, email=email, password_hash=hashed, currency=currency)
+
+    # A new account starts with a sensible set of categories so the user can
+    # log their first transaction without any setup.
+    category_repository.create_many(db, user.id, DEFAULT_CATEGORIES)
+    return user
 
 
 def login(db: Session, email: str, password: str) -> str:

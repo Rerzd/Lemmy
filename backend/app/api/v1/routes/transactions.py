@@ -1,6 +1,6 @@
 from datetime import date
-from typing import Optional
-from fastapi import APIRouter, Depends, Query
+from typing import Literal, Optional
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -14,21 +14,35 @@ router = APIRouter()
 
 @router.get("", response_model=list[TransactionResponse])
 def list_transactions(
+    response: Response,
     category_id: Optional[int] = Query(None),
-    type: Optional[str] = Query(None),
+    type: Optional[Literal["income", "expense"]] = Query(None),
     date_from: Optional[date] = Query(None),
     date_to: Optional[date] = Query(None),
+    month: Optional[int] = Query(None, ge=1, le=12),
+    year: Optional[int] = Query(None, ge=2000),
+    q: Optional[str] = Query(None, max_length=100, description="Case-insensitive search in the description"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return transaction_service.list_transactions(
+    items, total = transaction_service.list_transactions(
         db,
         user_id=current_user.id,
         category_id=category_id,
         type=type,
         date_from=date_from,
         date_to=date_to,
+        month=month,
+        year=year,
+        q=q,
+        limit=limit,
+        offset=offset,
     )
+    # The body stays a plain list; the total for pagination travels in a header.
+    response.headers["X-Total-Count"] = str(total)
+    return items
 
 
 @router.post("", response_model=TransactionResponse, status_code=201)
@@ -40,6 +54,7 @@ def create_transaction(
     return transaction_service.create_transaction(
         db,
         user_id=current_user.id,
+        user_currency=current_user.currency,
         category_id=body.category_id,
         amount=body.amount,
         currency=body.currency,
@@ -68,6 +83,7 @@ def update_transaction(
     return transaction_service.update_transaction(
         db,
         user_id=current_user.id,
+        user_currency=current_user.currency,
         transaction_id=transaction_id,
         category_id=body.category_id,
         amount=body.amount,

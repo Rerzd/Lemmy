@@ -4,6 +4,11 @@ from sqlalchemy.orm import Session
 from app.models.transaction import Transaction
 
 
+def _escape_like(value: str) -> str:
+    # Treat % and _ typed by the user as literal characters, not wildcards.
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
 def get_all_by_user(
     db: Session,
     user_id: int,
@@ -11,7 +16,10 @@ def get_all_by_user(
     type: Optional[str] = None,
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
-) -> list[Transaction]:
+    q: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> tuple[list[Transaction], int]:
     query = db.query(Transaction).filter(Transaction.user_id == user_id)
     if category_id is not None:
         query = query.filter(Transaction.category_id == category_id)
@@ -21,7 +29,23 @@ def get_all_by_user(
         query = query.filter(Transaction.date >= date_from)
     if date_to is not None:
         query = query.filter(Transaction.date <= date_to)
-    return query.order_by(Transaction.date.desc()).all()
+    if q:
+        query = query.filter(Transaction.description.ilike(f"%{_escape_like(q)}%", escape="\\"))
+
+    # Count before paginating so the client knows how many pages exist.
+    total = query.count()
+    # id as a tie-breaker keeps pages stable when several rows share a date.
+    items = (
+        query.order_by(Transaction.date.desc(), Transaction.id.desc())
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+    return items, total
+
+
+def count_by_category(db: Session, category_id: int) -> int:
+    return db.query(Transaction).filter(Transaction.category_id == category_id).count()
 
 
 def get_by_id(db: Session, transaction_id: int, user_id: int) -> Transaction | None:

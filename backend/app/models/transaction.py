@@ -1,9 +1,11 @@
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, Index, func
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 class Transaction(Base):
     __tablename__ = "transactions"
+    # Almost every query filters by user and a date range (lists, summaries).
+    __table_args__ = (Index("ix_transactions_user_id_date", "user_id", "date"),)
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

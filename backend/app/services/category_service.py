@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.category import Category
-from app.repositories import category_repository
+from app.repositories import budget_repository, category_repository, transaction_repository
 
 VALID_TYPES = {"income", "expense"}
 
@@ -10,7 +10,7 @@ VALID_TYPES = {"income", "expense"}
 def _validate_type(type: str) -> None:
     if type not in VALID_TYPES:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Category type must be 'income' or 'expense', got '{type}'.",
         )
 
@@ -36,9 +36,32 @@ def update_category(
 ) -> Category:
     _validate_type(type)
     category = _get_or_404(db, category_id, user_id)
+    # Flipping the type would leave existing transactions contradicting their category.
+    if type != category.type and transaction_repository.count_by_category(db, category.id):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Can't change the type of a category that already has transactions.",
+        )
     return category_repository.update(db, category, name=name, type=type, color=color, icon=icon)
+
+
+def _plural(count: int, word: str) -> str:
+    return f"{count} {word}{'' if count == 1 else 's'}"
 
 
 def delete_category(db: Session, user_id: int, category_id: int) -> None:
     category = _get_or_404(db, category_id, user_id)
+
+    # No cascades on purpose: silently wiping someone's transaction history
+    # because they removed a category is worse than asking them to reassign it.
+    transactions = transaction_repository.count_by_category(db, category.id)
+    budgets = budget_repository.count_by_category(db, category.id)
+    if transactions or budgets:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Category has {_plural(transactions, 'transaction')} and {_plural(budgets, 'budget')}. "
+                "Reassign or delete them first."
+            ),
+        )
     category_repository.delete(db, category)

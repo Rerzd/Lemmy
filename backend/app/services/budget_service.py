@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.budget import Budget
 from app.repositories import budget_repository, category_repository
+from app.services.currency import resolve_currency
 
 
 def _get_or_404(db: Session, budget_id: int, user_id: int) -> Budget:
@@ -13,12 +14,18 @@ def _get_or_404(db: Session, budget_id: int, user_id: int) -> Budget:
     return budget
 
 
-def _validate_category_ownership(db: Session, category_id: int, user_id: int) -> None:
+def _validate_category(db: Session, category_id: int, user_id: int) -> None:
     category = category_repository.get_by_id(db, category_id, user_id)
     if not category:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found or does not belong to you.",
+        )
+    # Budgets cap spending, so they only make sense on expense categories.
+    if category.type != "expense":
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Budgets can only be set on expense categories.",
         )
 
 
@@ -46,31 +53,34 @@ def list_budgets(
 def create_budget(
     db: Session,
     user_id: int,
+    user_currency: str,
     category_id: int,
     amount: float,
-    currency: str,
+    currency: Optional[str],
     month: int,
     year: int,
 ) -> Budget:
-    _validate_category_ownership(db, category_id, user_id)
+    _validate_category(db, category_id, user_id)
     _check_no_duplicate(db, user_id, category_id, month, year)
     return budget_repository.create(
         db,
         user_id=user_id,
         category_id=category_id,
         amount=amount,
-        currency=currency,
+        currency=resolve_currency(currency, user_currency),
         month=month,
         year=year,
     )
 
 
 def update_budget(
-    db: Session, user_id: int, budget_id: int, amount: float, currency: str
+    db: Session, user_id: int, user_currency: str, budget_id: int, amount: float, currency: Optional[str]
 ) -> Budget:
     # No duplicate check needed — category/month/year aren't changing.
     budget = _get_or_404(db, budget_id, user_id)
-    return budget_repository.update(db, budget, amount=amount, currency=currency)
+    return budget_repository.update(
+        db, budget, amount=amount, currency=resolve_currency(currency, user_currency)
+    )
 
 
 def delete_budget(db: Session, user_id: int, budget_id: int) -> None:

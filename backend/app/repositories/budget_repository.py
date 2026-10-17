@@ -25,6 +25,10 @@ def get_by_id(db: Session, budget_id: int, user_id: int) -> Budget | None:
     )
 
 
+def count_by_category(db: Session, category_id: int) -> int:
+    return db.query(Budget).filter(Budget.category_id == category_id).count()
+
+
 # Looks up a budget by its natural key — used to detect duplicates before creating.
 def get_by_unique_key(
     db: Session, user_id: int, category_id: int, month: int, year: int

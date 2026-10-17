@@ -30,6 +30,7 @@ def create_budget(
     return budget_service.create_budget(
         db,
         user_id=current_user.id,
+        user_currency=current_user.currency,
         category_id=body.category_id,
         amount=body.amount,
         currency=body.currency,
@@ -57,6 +58,7 @@ def update_budget(
     return budget_service.update_budget(
         db,
         user_id=current_user.id,
+        user_currency=current_user.currency,
         budget_id=budget_id,
         amount=body.amount,
         currency=body.currency,

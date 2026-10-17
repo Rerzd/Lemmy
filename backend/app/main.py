@@ -12,10 +12,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_origins=settings.cors_origins_list,  # Vite dev server by default
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Lets the browser read the pagination total sent by GET /transactions.
+    expose_headers=["X-Total-Count"],
 )
 
 app.include_router(router, prefix="/api/v1")

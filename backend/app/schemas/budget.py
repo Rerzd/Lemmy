@@ -1,10 +1,12 @@
-from pydantic import BaseModel, field_validator
+from typing import Optional
+from pydantic import BaseModel, Field, field_validator
 
 
 class BudgetCreate(BaseModel):
     category_id: int
-    amount: float
-    currency: str = "COP"
+    amount: float = Field(gt=0)
+    # Optional: the service fills in the user's currency when omitted.
+    currency: Optional[str] = None
     month: int
     year: int
 
@@ -26,8 +28,8 @@ class BudgetCreate(BaseModel):
 
 
 class BudgetUpdate(BaseModel):
-    amount: float
-    currency: str = "COP"
+    amount: float = Field(gt=0)
+    currency: Optional[str] = None
 
 
 class BudgetResponse(BaseModel):

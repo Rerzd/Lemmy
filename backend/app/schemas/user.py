@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
@@ -6,7 +7,8 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr  # Pydantic validates the email format for us
     password: str
-    currency: str = "COP"
+    # The currencies the UI knows how to format. Every amount the user records uses this one.
+    currency: Literal["COP", "USD", "EUR", "MXN"] = "COP"
 
 
 class UserResponse(BaseModel):

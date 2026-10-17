@@ -6,7 +6,8 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.schemas.budget import BudgetCreate, BudgetResponse, BudgetUpdate
-from app.services import budget_service
+from app.schemas.summary import BudgetStatus
+from app.services import budget_service, summary_service
 
 router = APIRouter()
 
@@ -37,6 +38,18 @@ def create_budget(
         month=body.month,
         year=body.year,
     )
+
+
+# Declared before "/{budget_id}" so "status" isn't parsed as a budget id.
+@router.get("/status", response_model=list[BudgetStatus])
+def budgets_status(
+    month: Optional[int] = Query(None, ge=1, le=12),
+    year: Optional[int] = Query(None, ge=2000),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    month, year = summary_service.resolve_period(month, year)
+    return summary_service.budgets_status(db, current_user.id, month, year)
 
 
 @router.get("/{budget_id}", response_model=BudgetResponse)

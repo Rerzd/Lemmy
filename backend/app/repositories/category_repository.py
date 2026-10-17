@@ -3,7 +3,7 @@ from app.models.category import Category
 
 
 def get_all_by_user(db: Session, user_id: int) -> list[Category]:
-    return db.query(Category).filter(Category.user_id == user_id).all()
+    return db.query(Category).filter(Category.user_id == user_id).order_by(Category.id).all()
 
 
 def get_by_id(db: Session, category_id: int, user_id: int) -> Category | None:
@@ -20,6 +20,14 @@ def create(db: Session, user_id: int, name: str, type: str, color: str, icon: st
     db.commit()
     db.refresh(category)
     return category
+
+
+def create_many(db: Session, user_id: int, categories: list[dict]) -> list[Category]:
+    # One commit for the whole batch instead of one per category.
+    rows = [Category(user_id=user_id, **data) for data in categories]
+    db.add_all(rows)
+    db.commit()
+    return rows
 
 
 def update(db: Session, category: Category, name: str, type: str, color: str, icon: str) -> Category:

@@ -1,4 +1,11 @@
+from pathlib import Path
+
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# backend/ — relative paths (the SQLite file, .env) resolve against it, so the
+# app behaves the same whether it's started from backend/ or the repo root.
+BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -17,7 +24,19 @@ class Settings(BaseSettings):
     # Comma-separated list, e.g. "http://localhost:5173,http://127.0.0.1:5173"
     CORS_ORIGINS: str = "http://localhost:5173"
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", extra="ignore")
+
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def _anchor_sqlite_path(cls, url: str) -> str:
+        # "sqlite:///./data/lemmy.db" is relative to the current directory by
+        # default; anchor it to backend/ instead. In-memory and absolute URLs pass through.
+        prefix = "sqlite:///"
+        if url.startswith(prefix) and not url.startswith(prefix + "/"):
+            path = url[len(prefix):]
+            if path and path != ":memory:" and not Path(path).is_absolute():
+                return prefix + (BACKEND_DIR / path).resolve().as_posix()
+        return url
 
     @property
     def cors_origins_list(self) -> list[str]:

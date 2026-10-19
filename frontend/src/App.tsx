@@ -1,21 +1,32 @@
-import { useAuth } from './context/AuthContext'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthPage } from './components/AuthPage'
-import { LoggedInView } from './components/LoggedInView'
+import { AppShell } from './components/layout/AppShell'
+import { PublicOnly, RequireAuth } from './components/RouteGuards'
+import { BudgetsPage } from './pages/Budgets'
+import { CategoriesPage } from './pages/Categories'
+import { DashboardPage } from './pages/Dashboard'
+import { TransactionsPage } from './pages/Transactions'
 
 function App() {
-  const { user, loading } = useAuth()
+  return (
+    <Routes>
+      <Route element={<PublicOnly />}>
+        <Route path="/login" element={<AuthPage mode="login" />} />
+        <Route path="/register" element={<AuthPage mode="register" />} />
+      </Route>
 
-  // While checking for an existing token, show a tiny loader.
-  // Prevents the login form from flashing for already-authenticated users.
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+      <Route element={<RequireAuth />}>
+        <Route element={<AppShell />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/budgets" element={<BudgetsPage />} />
+        </Route>
+      </Route>
 
-  return user ? <LoggedInView /> : <AuthPage />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
 }
 
 export default App

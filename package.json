@@ -1,0 +1,16 @@
+{
+  "name": "lemmy",
+  "private": true,
+  "description": "Personal finance tracker: FastAPI + SQLite backend, React + Vite frontend.",
+  "scripts": {
+    "setup": "npm install && npm --prefix frontend install && python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt && npm run db:migrate && npm run db:seed",
+    "dev": "concurrently -n api,web -c cyan,magenta --kill-others-on-fail \"python -m uvicorn app.main:app --reload --app-dir backend --reload-dir backend --port 8000\" \"npm --prefix frontend run dev\"",
+    "db:migrate": "cd backend && python -m alembic upgrade head",
+    "db:seed": "cd backend && python -m app.scripts.seed_demo",
+    "db:reset": "node -e \"require('fs').rmSync('backend/data/lemmy.db', { force: true })\" && npm run db:migrate && npm run db:seed",
+    "test": "python -m pytest backend/tests"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

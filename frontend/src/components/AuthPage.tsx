@@ -1,31 +1,21 @@
-import { useState } from 'react'
+import { Logo } from './layout/Logo'
 import { LoginForm } from './LoginForm'
 import { RegisterForm } from './RegisterForm'
 
-export function AuthPage() {
-  const [mode, setMode] = useState<'login' | 'register'>('login')
-
+export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Brand header */}
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-            Lemmy
-          </h1>
-          <p className="text-slate-400 mt-2">Your personal finance tracker</p>
+    <div className="flex min-h-dvh items-center justify-center bg-slate-950 px-4 py-10">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Logo />
+          <p className="mt-3 text-sm text-slate-400">Track income, spending and budgets in one place.</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-slate-900/60 backdrop-blur-sm border border-slate-800 rounded-2xl shadow-2xl shadow-violet-500/5 p-8">
-          <h2 className="text-2xl font-semibold text-slate-100 mb-6">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 sm:p-7">
+          <h1 className="mb-5 text-xl font-semibold text-slate-100">
             {mode === 'login' ? 'Welcome back' : 'Create your account'}
-          </h2>
-          {mode === 'login' ? (
-            <LoginForm onSwitchToRegister={() => setMode('register')} />
-          ) : (
-            <RegisterForm onSwitchToLogin={() => setMode('login')} />
-          )}
+          </h1>
+          {mode === 'login' ? <LoginForm /> : <RegisterForm />}
         </div>
       </div>
     </div>

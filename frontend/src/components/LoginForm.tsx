@@ -1,7 +1,14 @@
 import { useState } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { getErrorMessage } from '../lib/errors'
+import { inputClass, labelClass } from '../lib/ui'
+import { Button } from './ui/Button'
 
-export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => void }) {
+// Created by `npm run setup` / `npm run db:reset` (backend/app/scripts/seed_demo.py).
+const DEMO = { email: 'demo@lemmy.app', password: 'demo1234' }
+
+export function LoginForm() {
   const { login } = useAuth()
   // Each input field has its own state — these are "controlled inputs".
   // React owns the value; the input just displays it and reports changes.
@@ -10,67 +17,80 @@ export function LoginForm({ onSwitchToRegister }: { onSwitchToRegister: () => vo
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function signIn(emailValue: string, passwordValue: string) {
     setError(null)
     setSubmitting(true)
     try {
-      await login(email, password)
-    } catch (err: any) {
-      setError(err.response?.data?.detail ?? 'Login failed')
+      await login(emailValue, passwordValue)
+    } catch (err) {
+      setError(getErrorMessage(err, 'Login failed'))
     } finally {
       setSubmitting(false)
     }
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    void signIn(email, password)
+  }
+
+  function fillDemo() {
+    setEmail(DEMO.email)
+    setPassword(DEMO.password)
+    void signIn(DEMO.email, DEMO.password)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Email</label>
+        <label htmlFor="email" className={labelClass}>
+          Email
+        </label>
         <input
+          id="email"
           type="email"
           required
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition"
+          className={inputClass}
           placeholder="you@example.com"
         />
       </div>
       <div>
-        <label className="block text-sm text-slate-400 mb-1">Password</label>
+        <label htmlFor="password" className={labelClass}>
+          Password
+        </label>
         <input
+          id="password"
           type="password"
           required
+          autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition"
-          placeholder="••••••••"
+          className={inputClass}
+          placeholder="Your password"
         />
       </div>
 
       {error && (
-        <div className="px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-300 text-sm">
+        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" role="alert">
           {error}
-        </div>
+        </p>
       )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full py-2.5 rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {submitting ? 'Signing in…' : 'Sign in'}
-      </button>
+      <Button type="submit" loading={submitting} className="w-full">
+        Sign in
+      </Button>
+      <Button variant="secondary" onClick={fillDemo} disabled={submitting} className="w-full">
+        Try the demo account
+      </Button>
 
-      <p className="text-center text-sm text-slate-400">
+      <p className="pt-1 text-center text-sm text-slate-400">
         Don't have an account?{' '}
-        <button
-          type="button"
-          onClick={onSwitchToRegister}
-          className="text-violet-400 hover:text-violet-300 font-medium"
-        >
+        <Link to="/register" className="font-medium text-violet-300 hover:text-violet-200">
           Create one
-        </button>
+        </Link>
       </p>
     </form>
   )

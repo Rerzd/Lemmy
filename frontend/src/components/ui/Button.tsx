@@ -12,8 +12,9 @@ const VARIANTS: Record<Variant, string> = {
 }
 
 const SIZES: Record<Size, string> = {
-  sm: 'h-8 px-3 text-sm gap-1.5',
-  md: 'h-10 px-4 text-sm gap-2',
+  // 44px touch targets on phones, compact from sm up.
+  sm: 'h-11 min-w-11 sm:h-8 sm:min-w-0 px-3 text-sm gap-1.5',
+  md: 'h-11 sm:h-10 px-4 text-sm gap-2',
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

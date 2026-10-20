@@ -7,12 +7,13 @@ interface SegmentedControlProps<T extends string> {
 }
 
 // Pill-style toggle for a small set of exclusive choices (All / Income / Expense).
+// 50px with 2px padding leaves 44px segments on phones; compact from sm up.
 export function SegmentedControl<T extends string>({ label, value, options, onChange, className = '' }: SegmentedControlProps<T>) {
   return (
     <div
       role="radiogroup"
       aria-label={label}
-      className={`inline-flex h-10 rounded-lg border border-slate-800 bg-slate-950 p-1 ${className}`}
+      className={`inline-flex h-[50px] rounded-lg border border-slate-800 bg-slate-950 p-0.5 sm:h-10 sm:p-1 ${className}`}
     >
       {options.map((option) => {
         const selected = option.value === value

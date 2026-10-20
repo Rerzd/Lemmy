@@ -8,7 +8,9 @@
     "db:migrate": "cd backend && python -m alembic upgrade head",
     "db:seed": "cd backend && python -m app.scripts.seed_demo",
     "db:reset": "node -e \"require('fs').rmSync('backend/data/lemmy.db', { force: true })\" && npm run db:migrate && npm run db:seed",
-    "test": "python -m pytest backend/tests"
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "python -m pytest backend/tests",
+    "test:web": "npm --prefix frontend test"
   },
   "devDependencies": {
     "concurrently": "^10.0.6"

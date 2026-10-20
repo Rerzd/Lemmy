@@ -1,0 +1,30 @@
+# Optional: run Lemmy without installing Python or Node.
+#   docker compose up --build   ->  app on http://localhost:8080, API on http://localhost:8000
+# The SQLite database persists in the "lemmy-data" volume.
+services:
+  backend:
+    build: ./backend
+    environment:
+      # Placeholder only; set a real value in your shell or a root .env file.
+      SECRET_KEY: ${SECRET_KEY:-change-me}
+      CORS_ORIGINS: http://localhost:8080
+    ports:
+      - "8000:8000"
+    volumes:
+      - lemmy-data:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Called from the browser, so it must be reachable from the host.
+        VITE_API_URL: http://localhost:8000/api/v1
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  lemmy-data:

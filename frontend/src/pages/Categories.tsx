@@ -29,11 +29,11 @@ interface CategoryCardProps {
 
 function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
   return (
-    <li className="group flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900 p-3 transition-colors hover:border-slate-700">
+    <li className="group flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900 pr-1.5 transition-colors hover:border-slate-700 sm:pr-3">
       <button
         type="button"
         onClick={onEdit}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-violet-500"
       >
         <CategoryIcon icon={category.icon} color={category.color} />
         <span className="truncate text-sm font-medium text-slate-200">{category.name}</span>
@@ -43,7 +43,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
           type="button"
           onClick={onEdit}
           aria-label={`Edit ${category.name}`}
-          className="rounded-md p-1.5 text-slate-500 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-violet-500"
+          className="flex size-11 items-center justify-center rounded-md text-slate-500 sm:size-8 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-violet-500"
         >
           <Pencil className="size-4" aria-hidden />
         </button>
@@ -51,7 +51,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
           type="button"
           onClick={onDelete}
           aria-label={`Delete ${category.name}`}
-          className="rounded-md p-1.5 text-slate-500 hover:bg-slate-800 hover:text-rose-400 focus-visible:outline-2 focus-visible:outline-violet-500"
+          className="flex size-11 items-center justify-center rounded-md text-slate-500 sm:size-8 hover:bg-slate-800 hover:text-rose-400 focus-visible:outline-2 focus-visible:outline-violet-500"
         >
           <Trash2 className="size-4" aria-hidden />
         </button>

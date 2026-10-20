@@ -103,7 +103,7 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
 
         <fieldset>
           <legend className={labelClass}>Color</legend>
-          <div role="radiogroup" aria-label="Color" className="flex flex-wrap gap-2">
+          <div role="radiogroup" aria-label="Color" className="grid grid-cols-5 justify-items-center gap-1 sm:flex sm:flex-wrap sm:gap-2">
             {swatches.map((swatch) => {
               const selected = swatch.value.toLowerCase() === color.toLowerCase()
               return (
@@ -115,12 +115,16 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
                   aria-label={swatch.name}
                   title={swatch.name}
                   onClick={() => setColor(swatch.value)}
-                  className={`flex size-8 items-center justify-center rounded-full ring-offset-2 ring-offset-slate-900 transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-500 ${
-                    selected ? 'ring-2 ring-slate-100' : 'hover:scale-110'
-                  }`}
-                  style={{ backgroundColor: swatch.value }}
+                  className="group flex size-11 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-violet-500 sm:size-8"
                 >
-                  {selected && <Check className="size-4 text-slate-950" strokeWidth={3} aria-hidden />}
+                  <span
+                    className={`flex size-8 items-center justify-center rounded-full ring-offset-2 ring-offset-slate-900 transition ${
+                      selected ? 'ring-2 ring-slate-100' : 'group-hover:scale-110'
+                    }`}
+                    style={{ backgroundColor: swatch.value }}
+                  >
+                    {selected && <Check className="size-4 text-slate-950" strokeWidth={3} aria-hidden />}
+                  </span>
                 </button>
               )
             })}
@@ -129,7 +133,7 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
 
         <fieldset>
           <legend className={labelClass}>Icon</legend>
-          <div role="radiogroup" aria-label="Icon" className="grid grid-cols-7 gap-2">
+          <div role="radiogroup" aria-label="Icon" className="grid grid-cols-5 gap-2 sm:grid-cols-7">
             {ICON_KEYS.map((key) => {
               const Icon = CATEGORY_ICONS[key]
               const selected = key === icon

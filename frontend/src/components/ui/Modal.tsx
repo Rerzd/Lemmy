@@ -44,7 +44,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+            className="-my-2 -mr-3 flex size-11 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 sm:m-0 sm:size-auto sm:p-1"
             aria-label="Close"
           >
             <X className="size-4" />

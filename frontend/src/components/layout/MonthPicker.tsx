@@ -6,7 +6,7 @@ export function MonthPicker() {
   const { year, month, isCurrent, prev, next, reset } = useMonth()
 
   const arrow =
-    'flex size-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-violet-500'
+    'flex size-11 sm:size-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-violet-500'
 
   return (
     <div className="flex items-center gap-1">

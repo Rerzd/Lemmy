@@ -22,7 +22,7 @@ export function TopBar() {
             type="button"
             onClick={logout}
             aria-label="Sign out"
-            className="rounded-md p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 sm:hidden"
+            className="flex size-11 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-100 sm:hidden"
           >
             <LogOut className="size-4" />
           </button>

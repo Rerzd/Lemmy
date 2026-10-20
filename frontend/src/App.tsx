@@ -1,11 +1,14 @@
+import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthPage } from './components/AuthPage'
 import { AppShell } from './components/layout/AppShell'
 import { PublicOnly, RequireAuth } from './components/RouteGuards'
-import { BudgetsPage } from './pages/Budgets'
-import { CategoriesPage } from './pages/Categories'
-import { DashboardPage } from './pages/Dashboard'
-import { TransactionsPage } from './pages/Transactions'
+
+// Pages load on demand, so the login screen doesn't download the charting library.
+const DashboardPage = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.DashboardPage })))
+const TransactionsPage = lazy(() => import('./pages/Transactions').then((m) => ({ default: m.TransactionsPage })))
+const CategoriesPage = lazy(() => import('./pages/Categories').then((m) => ({ default: m.CategoriesPage })))
+const BudgetsPage = lazy(() => import('./pages/Budgets').then((m) => ({ default: m.BudgetsPage })))
 
 function App() {
   return (

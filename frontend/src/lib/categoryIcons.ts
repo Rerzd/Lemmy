@@ -36,15 +36,22 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
 
 export const ICON_KEYS = Object.keys(CATEGORY_ICONS)
 
+// Same hues as the default categories, so new ones sit well next to them.
 export const COLOR_SWATCHES = [
-  '#10b981',
-  '#14b8a6',
-  '#06b6d4',
-  '#3b82f6',
-  '#6366f1',
-  '#8b5cf6',
-  '#ec4899',
-  '#ef4444',
-  '#f97316',
-  '#eab308',
+  { value: '#10b981', name: 'Emerald' },
+  { value: '#14b8a6', name: 'Teal' },
+  { value: '#06b6d4', name: 'Cyan' },
+  { value: '#3b82f6', name: 'Blue' },
+  { value: '#6366f1', name: 'Indigo' },
+  { value: '#8b5cf6', name: 'Violet' },
+  { value: '#ec4899', name: 'Pink' },
+  { value: '#ef4444', name: 'Red' },
+  { value: '#f97316', name: 'Orange' },
+  { value: '#eab308', name: 'Yellow' },
 ]
+
+// "heart-pulse" -> "Heart pulse", for labels and tooltips.
+export function iconLabel(key: string): string {
+  const words = key.replace(/-/g, ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}

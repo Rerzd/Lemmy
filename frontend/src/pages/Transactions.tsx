@@ -161,7 +161,7 @@ export function TransactionsPage() {
                 type="button"
                 onClick={() => onSearch('')}
                 aria-label="Clear search"
-                className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-200"
+                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-slate-500 hover:text-slate-200 sm:w-9"
               >
                 <X className="size-3.5" aria-hidden />
               </button>

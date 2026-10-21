@@ -65,7 +65,7 @@ export function TrendChart({ points, currency }: { points: TrendPoint[]; currenc
           Expenses
         </span>
       </div>
-      <div className="h-64 lg:h-[26rem]" role="img" aria-label="Bar chart of income and expenses for the last six months">
+      <div className="h-64 lg:h-80" role="img" aria-label="Bar chart of income and expenses for the last six months">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={rows} barGap={2} barCategoryGap="28%" margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke={colors.grid} />

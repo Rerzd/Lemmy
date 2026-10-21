@@ -1,10 +1,9 @@
-import type { KeyboardEvent } from 'react'
 import { Trash2 } from 'lucide-react'
 import type { Category, Transaction } from '../../types/api'
-import { formatDate } from '../../lib/dates'
+import { dayLabel } from '../../lib/dates'
+import { DEFAULT_CATEGORY_COLOR } from '../../lib/categoryIcons'
 import { formatSigned } from '../../lib/money'
-import { CategoryChip } from '../ui/CategoryIcon'
-import { TransactionItem } from './TransactionItem'
+import { CategoryChip, CategoryIcon } from '../ui/CategoryIcon'
 
 interface TransactionListProps {
   items: Transaction[]
@@ -13,82 +12,64 @@ interface TransactionListProps {
   onDelete: (transaction: Transaction) => void
 }
 
-// Table from md up, compact cards below. Clicking a row (or Enter on it) edits it.
-export function TransactionList({ items, categoryById, onEdit, onDelete }: TransactionListProps) {
-  const onRowKey = (e: KeyboardEvent, transaction: Transaction) => {
-    if (e.target !== e.currentTarget) return
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onEdit(transaction)
-    }
+// Rows grouped under day headings. Items arrive newest first, so consecutive dates form a group.
+function groupByDay(items: Transaction[]) {
+  const groups: { date: string; items: Transaction[] }[] = []
+  for (const t of items) {
+    const last = groups.at(-1)
+    if (last?.date === t.date) last.items.push(t)
+    else groups.push({ date: t.date, items: [t] })
   }
+  return groups
+}
 
+export function TransactionList({ items, categoryById, onEdit, onDelete }: TransactionListProps) {
   return (
-    <>
-      <table className="hidden w-full text-sm md:table">
-        <thead>
-          <tr className="border-b border-border text-left text-xs font-medium tracking-wide text-text-muted uppercase">
-            <th className="py-2.5 pr-4 font-medium">Date</th>
-            <th className="py-2.5 pr-4 font-medium">Description</th>
-            <th className="py-2.5 pr-4 font-medium">Category</th>
-            <th className="py-2.5 pr-2 text-right font-medium">Amount</th>
-            <th className="w-10 py-2.5">
-              <span className="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">
-          {items.map((t) => {
-            const category = categoryById.get(t.category_id)
-            return (
-              <tr
-                key={t.id}
-                tabIndex={0}
-                onClick={() => onEdit(t)}
-                onKeyDown={(e) => onRowKey(e, t)}
-                aria-label={`Edit ${t.description || category?.name || 'transaction'}`}
-                className="group cursor-pointer hover:bg-surface-2/70 focus-visible:bg-surface-2/70 focus-visible:outline-none"
-              >
-                <td className="py-3 pr-4 whitespace-nowrap text-text-muted tabular-nums">{formatDate(t.date)}</td>
-                <td className="max-w-0 py-3 pr-4">
-                  <p className="truncate text-text">{t.description || <span className="text-text-muted">No description</span>}</p>
-                </td>
-                <td className="py-3 pr-4">
-                  {category ? (
-                    <CategoryChip name={category.name} icon={category.icon} color={category.color} />
-                  ) : (
-                    <span className="text-xs text-text-muted">Unknown</span>
-                  )}
-                </td>
-                <td
-                  className={`py-3 pr-2 text-right font-medium whitespace-nowrap tabular-nums ${t.type === 'income' ? 'text-income' : 'text-expense'}`}
-                >
-                  {formatSigned(t.amount, t.currency, t.type)}
-                </td>
-                <td className="py-3 text-right">
+    <div className="space-y-5">
+      {groupByDay(items).map((group) => (
+        <section key={group.date} aria-labelledby={`day-${group.date}`}>
+          <h3 id={`day-${group.date}`} className="mb-1 px-2 font-sans text-xs font-semibold tracking-wide text-text-muted uppercase">
+            {dayLabel(group.date)}
+          </h3>
+          <ul className="-mx-2">
+            {group.items.map((t) => {
+              const category = categoryById.get(t.category_id)
+              const title = t.description || category?.name || 'Transaction'
+              return (
+                <li key={t.id} className="group flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onDelete(t)
-                    }}
-                    aria-label="Delete transaction"
-                    className="rounded-chip p-1.5 text-text-muted opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 hover:bg-surface-2 hover:text-status-over focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary"
+                    onClick={() => onEdit(t)}
+                    aria-label={`Edit ${title}, ${formatSigned(t.amount, t.currency, t.type)}`}
+                    className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-control px-2 py-2 text-left hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-primary"
+                  >
+                    <CategoryIcon icon={category?.icon ?? 'tag'} color={category?.color ?? DEFAULT_CATEGORY_COLOR} />
+                    <span className="min-w-0 flex-1">
+                      <span className={`block truncate text-sm font-medium ${t.description ? 'text-text' : 'text-text-muted'}`}>{title}</span>
+                      {/* Phones show the category under the description; wider screens give it a column. */}
+                      <span className="block truncate text-xs text-text-muted md:hidden">{category?.name ?? 'Unknown category'}</span>
+                    </span>
+                    <span className="hidden w-48 shrink-0 md:block">
+                      {category && <CategoryChip name={category.name} icon={category.icon} color={category.color} />}
+                    </span>
+                    <span className={`shrink-0 text-right text-sm font-semibold md:w-32 ${t.type === 'income' ? 'text-income' : 'text-expense'}`}>
+                      {formatSigned(t.amount, t.currency, t.type)}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(t)}
+                    aria-label={`Delete ${title}`}
+                    className="hidden size-9 shrink-0 items-center justify-center rounded-chip text-text-muted opacity-0 group-hover:opacity-100 hover:bg-surface-2 hover:text-status-over focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary md:flex"
                   >
                     <Trash2 className="size-4" aria-hidden />
                   </button>
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-
-      <div className="-mx-2 divide-y divide-border md:hidden">
-        {items.map((t) => (
-          <TransactionItem key={t.id} transaction={t} category={categoryById.get(t.category_id)} onClick={() => onEdit(t)} />
-        ))}
-      </div>
-    </>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      ))}
+    </div>
   )
 }

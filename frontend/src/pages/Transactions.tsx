@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Plus, Receipt, Search, SearchX, X } from 'lucide-react'
 import { listCategories } from '../api/categories'
+import { getOverview } from '../api/summary'
 import { deleteTransaction, listTransactions } from '../api/transactions'
 import { TransactionList } from '../components/transactions/TransactionList'
 import { TransactionModal } from '../components/transactions/TransactionModal'
@@ -19,7 +20,7 @@ import { useCurrency } from '../hooks/useAuth'
 import { useMonth } from '../hooks/useMonth'
 import { monthLabel } from '../lib/dates'
 import { getErrorMessage } from '../lib/errors'
-import { formatSigned } from '../lib/money'
+import { formatMoney, formatSigned } from '../lib/money'
 import { inputClass } from '../lib/ui'
 import type { Transaction, TxType } from '../types/api'
 
@@ -90,6 +91,7 @@ export function TransactionsPage() {
   }
   const list = useAsync(() => listTransactions(filters), JSON.stringify(filters))
   const categories = useAsync(listCategories, 'categories')
+  const totals = useAsync(() => getOverview(month, year), `${year}-${month}`)
 
   const allCategories = categories.data ?? []
   const categoryById = new Map(allCategories.map((c) => [c.id, c]))
@@ -109,6 +111,7 @@ export function TransactionsPage() {
     setModal(null)
     toast.success(created ? 'Transaction added' : 'Transaction updated')
     list.reload()
+    totals.reload()
   }
 
   const askDelete = (transaction: Transaction) => {
@@ -123,6 +126,7 @@ export function TransactionsPage() {
       await deleteTransaction(toDelete.id)
       toast.success('Transaction deleted')
       setToDelete(null)
+      totals.reload()
       // Removing the only row on the last page would leave an empty page behind.
       if (list.data && list.data.items.length === 1 && page > 1) updateParams({ page: page - 1 })
       else list.reload()
@@ -219,6 +223,20 @@ export function TransactionsPage() {
           )
         ) : (
           <div className={`space-y-4 transition-opacity ${list.loading ? 'opacity-60' : ''}`} aria-busy={list.loading}>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-border pb-3">
+              <p className="text-sm text-text">
+                <span className="font-display text-lg font-semibold">{list.data.total}</span>{' '}
+                {list.data.total === 1 ? 'transaction' : 'transactions'}
+                <span className="text-text-muted">{hasFilters ? ' match your filters' : ` in ${monthLabel({ year, month })}`}</span>
+              </p>
+              {!hasFilters && totals.data && (
+                <p className="text-sm text-text-muted">
+                  In <span className="font-semibold text-income">{formatMoney(totals.data.income, currency)}</span>
+                  <span aria-hidden> · </span>
+                  Out <span className="font-semibold text-expense">{formatMoney(totals.data.expense, currency)}</span>
+                </p>
+              )}
+            </div>
             <TransactionList items={list.data.items} categoryById={categoryById} onEdit={setModal} onDelete={askDelete} />
             <div className="border-t border-border pt-4">
               <Pagination page={page} pageSize={PAGE_SIZE} total={list.data.total} onChange={(p) => updateParams({ page: p })} />

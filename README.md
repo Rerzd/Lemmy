@@ -1,5 +1,7 @@
 # Lemmy
 
+[![CI](https://github.com/Rerzd/Lemmy/actions/workflows/ci.yml/badge.svg)](https://github.com/Rerzd/Lemmy/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **A personal finance tracker that tells you where your money went this month, and whether you're still on budget.**
 
 Lemmy records income and expenses by category, sets monthly budgets per category, and turns them into a dashboard: month-over-month KPIs, a six-month income vs expenses trend, spending by category and budget health. It's a full-stack project built to be easy to run: one command starts the API and the web app against a local SQLite file, already seeded with six months of realistic demo data.
@@ -258,3 +260,7 @@ npm run test:web     # frontend only
 - **Exact amounts:** store money as `Numeric` instead of `Float` to rule out rounding drift.
 - **Recurring transactions:** rent, salary and subscriptions created automatically each month.
 - **CSV import:** bring in bank statements and map their columns to categories.
+
+## License
+
+[MIT](LICENSE) © 2026 José Daniel Pulido Reyes

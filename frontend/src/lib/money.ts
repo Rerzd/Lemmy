@@ -17,8 +17,9 @@ function formatter(currency: string, compact: boolean): Intl.NumberFormat {
       style: 'currency',
       currency,
       // Pesos are never split into cents in everyday use.
-      maximumFractionDigits: currency === 'COP' || compact ? 0 : 2,
-      minimumFractionDigits: currency === 'COP' || compact ? 0 : undefined,
+      // Compact keeps one decimal so $1.8M doesn't read as $2M; pesos never show cents.
+      maximumFractionDigits: compact ? 1 : currency === 'COP' ? 0 : 2,
+      minimumFractionDigits: compact || currency === 'COP' ? 0 : undefined,
       notation: compact ? 'compact' : 'standard',
     })
     formatters.set(key, f)

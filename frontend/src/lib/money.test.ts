@@ -14,7 +14,9 @@ describe('formatMoney', () => {
   })
 
   it('supports a compact form', () => {
-    expect(formatMoney(4_120_000, 'USD', { compact: true })).toBe('$4M')
+    expect(formatMoney(4_120_000, 'USD', { compact: true })).toBe('$4.1M')
+    expect(formatMoney(8_000_000, 'USD', { compact: true })).toBe('$8M')
+    expect(plain(formatMoney(1_800_000, 'COP', { compact: true }))).toBe('$1,8 M')
   })
 })
 

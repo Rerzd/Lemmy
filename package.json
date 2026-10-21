@@ -2,6 +2,7 @@
   "name": "lemmy",
   "private": true,
   "description": "Personal finance tracker: FastAPI + SQLite backend, React + Vite frontend.",
+  "license": "MIT",
   "scripts": {
     "setup": "npm install && npm --prefix frontend install && python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt && npm run db:migrate && npm run db:seed",
     "dev": "concurrently -n api,web -c cyan,magenta --kill-others-on-fail \"python -m uvicorn app.main:app --reload --app-dir backend --reload-dir backend --port 8000\" \"npm --prefix frontend run dev\"",

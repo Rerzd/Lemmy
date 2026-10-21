@@ -1,0 +1,100 @@
+/*
+ * Design tokens. Components never use raw palette classes: they use the Tailwind
+ * utilities generated from these roles (bg-surface, text-text-muted, ...).
+ * The active theme is set as data-theme on <html> before first paint (index.html).
+ *
+ * Contrast is checked by src/styles/tokens.test.ts: every text role is at least
+ * 4.5:1 (WCAG AA) on bg, surface and surface-2; borders, focus rings and chart
+ * marks are at least 3:1 against the surface they sit on.
+ */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces, from the page back to raised panels */
+  --bg: #f0f6ea; /* mint paper */
+  --surface: #fbfdf8;
+  --surface-2: #e8f1df; /* hover, selected, skeletons, recessed wells */
+  --border: #d2dfc6; /* hairlines between regions (decorative) */
+  --border-strong: #7a8c72; /* input outlines: 3:1 against bg and surface */
+  --scrim: rgb(27 38 25 / 0.45);
+
+  /* Text */
+  --text: #1b2619; /* moss ink */
+  --text-muted: #4d5c48;
+
+  /* Brand */
+  --primary: #2e7d32; /* basil: buttons, focus rings, active marks */
+  --primary-hover: #256b29;
+  --primary-text: #256b29; /* basil for text, AA on every surface incl. surface-2 */
+  --primary-contrast: #ffffff;
+  --highlight: #8fcb4f; /* kiwi: fills only, never text (1.9:1 on surface) */
+  --ink: #1b2619; /* glyphs drawn on bright fills: highlight, category swatches */
+  --accent: #7b3f8c; /* plum */
+
+  /* Money and status (status always ships with an icon and a label) */
+  --income: #256b29;
+  --expense: #b3261e;
+  --status-ok: #256b29;
+  --status-warning: #8a5300;
+  --status-over: #b3261e;
+  --danger: #b3261e;
+  --danger-hover: #9a2019;
+  --danger-contrast: #ffffff;
+
+  /* Charts: fixed order, adjacent pairs separated under simulated CVD */
+  --chart-1: #256b29;
+  --chart-2: #db7044;
+  --chart-3: #6e3480;
+  --chart-4: #2f86c0;
+  --chart-5: #7a4e00;
+  --chart-6: #3a9686;
+
+  /* Elevation: only raised and floating elements get a shadow */
+  --shadow-raised: 0 1px 2px rgb(27 38 25 / 0.05), 0 6px 16px -8px rgb(27 38 25 / 0.16);
+  --shadow-overlay: 0 2px 6px rgb(27 38 25 / 0.08), 0 24px 48px -16px rgb(27 38 25 / 0.32);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Moss surfaces: green-tinted, never near-black */
+  --bg: #182216;
+  --surface: #202c1d;
+  --surface-2: #2b3a27;
+  --border: #364832;
+  --border-strong: #71876a;
+  --scrim: rgb(8 12 7 / 0.6);
+
+  --text: #e5eedc;
+  --text-muted: #a8b79f;
+
+  /* Softened basil and kiwi so text on and around them keeps AA */
+  --primary: #8ccb8f;
+  --primary-hover: #a3d6a5;
+  --primary-text: #8ccb8f;
+  --primary-contrast: #102010;
+  --highlight: #b4d98a;
+  --ink: #1b2619;
+  --accent: #d2a6dd;
+
+  --income: #8fd392;
+  --expense: #f2a196;
+  --status-ok: #8fd392;
+  --status-warning: #e8c46f;
+  --status-over: #f2a196;
+  --danger: #e8867a;
+  --danger-hover: #f09a8f;
+  --danger-contrast: #1e0d0a;
+
+  --chart-1: #8fd392;
+  --chart-2: #e07a5c;
+  --chart-3: #ddb7e6;
+  --chart-4: #5fa8db;
+  --chart-5: #e8c46f;
+  --chart-6: #58a79a;
+
+  --shadow-raised: 0 1px 0 rgb(229 238 220 / 0.04) inset, 0 8px 20px -10px rgb(4 8 4 / 0.55);
+  --shadow-overlay: 0 1px 0 rgb(229 238 220 / 0.05) inset, 0 28px 56px -16px rgb(4 8 4 / 0.7);
+}

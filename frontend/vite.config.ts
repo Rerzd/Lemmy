@@ -10,5 +10,7 @@ export default defineConfig({
     include: ['src/**/*.test.{ts,tsx}'],
     // Unmount rendered components between tests.
     setupFiles: ['src/test/setup.ts'],
+    // Vitest empties CSS by default; tokens.test.ts reads the real token values.
+    css: { include: [/tokens\.css/] },
   },
 })

@@ -1,6 +1,7 @@
 import type { Category, Transaction } from '../../types/api'
 import { formatDate } from '../../lib/dates'
 import { formatSigned } from '../../lib/money'
+import { DEFAULT_CATEGORY_COLOR } from '../../lib/categoryIcons'
 import { CategoryIcon } from '../ui/CategoryIcon'
 
 interface TransactionItemProps {
@@ -13,17 +14,17 @@ interface TransactionItemProps {
 export function TransactionItem({ transaction, category, onClick }: TransactionItemProps) {
   const content = (
     <>
-      <CategoryIcon icon={category?.icon ?? 'tag'} color={category?.color ?? '#64748b'} />
+      <CategoryIcon icon={category?.icon ?? 'tag'} color={category?.color ?? DEFAULT_CATEGORY_COLOR} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-slate-200">
+        <p className="truncate text-sm font-medium text-text">
           {transaction.description || category?.name || 'Transaction'}
         </p>
-        <p className="truncate text-xs text-slate-500">
+        <p className="truncate text-xs text-text-muted">
           {category?.name ?? 'Unknown category'} · {formatDate(transaction.date)}
         </p>
       </div>
       <span
-        className={`shrink-0 text-sm font-medium tabular-nums ${transaction.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}
+        className={`shrink-0 text-sm font-medium tabular-nums ${transaction.type === 'income' ? 'text-income' : 'text-expense'}`}
       >
         {formatSigned(transaction.amount, transaction.currency, transaction.type)}
       </span>
@@ -35,7 +36,7 @@ export function TransactionItem({ transaction, category, onClick }: TransactionI
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left hover:bg-slate-800/60 focus-visible:outline-2 focus-visible:outline-violet-500"
+      className="flex w-full items-center gap-3 rounded-control px-2 py-2.5 text-left hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-primary"
     >
       {content}
     </button>

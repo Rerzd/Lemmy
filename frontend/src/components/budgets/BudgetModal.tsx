@@ -71,19 +71,19 @@ export function BudgetModal({ budget, available, period, currency, onClose, onSa
     >
       <form id={formId} onSubmit={onSubmit} className="space-y-4" noValidate>
         {isEdit ? (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5">
+          <div className="flex items-center gap-3 rounded-control border border-border bg-bg px-3 py-2.5">
             <CategoryIcon icon={budget.icon} color={budget.color} />
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-slate-200">{budget.name}</p>
-              <p className="text-xs text-slate-500 tabular-nums">
+              <p className="truncate text-sm font-medium text-text">{budget.name}</p>
+              <p className="text-xs text-text-muted tabular-nums">
                 {monthLabel(period)} · {formatMoney(budget.spent, currency)} spent so far
               </p>
             </div>
           </div>
         ) : blocked ? (
-          <p className="rounded-lg border border-dashed border-slate-700 px-3 py-3 text-sm text-slate-400">
+          <p className="rounded-control border border-dashed border-border-strong px-3 py-3 text-sm text-text-muted">
             Every expense category already has a budget for {monthLabel(period)}. Edit an existing one, or{' '}
-            <Link to="/categories" className="font-medium text-violet-300 hover:text-violet-200">
+            <Link to="/categories" className="font-medium text-primary-text hover:underline">
               create a new category
             </Link>
             .
@@ -105,7 +105,7 @@ export function BudgetModal({ budget, available, period, currency, onClose, onSa
                 </option>
               ))}
             </select>
-            <p className="mt-1.5 text-xs text-slate-500">Only expense categories without a budget this month are listed.</p>
+            <p className="mt-1.5 text-xs text-text-muted">Only expense categories without a budget this month are listed.</p>
           </div>
         )}
 
@@ -131,7 +131,7 @@ export function BudgetModal({ budget, available, period, currency, onClose, onSa
         )}
 
         {error && (
-          <p role="alert" className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+          <p role="alert" className="flex items-start gap-2 rounded-control border border-status-over/30 bg-status-over/10 px-3 py-2.5 text-sm text-status-over">
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
             {error}
           </p>

@@ -36,6 +36,9 @@ export const CATEGORY_ICONS: Record<string, LucideIcon> = {
 
 export const ICON_KEYS = Object.keys(CATEGORY_ICONS)
 
+// Stored category color when none is set (backend DEFAULT_COLOR); it's data, not theme.
+export const DEFAULT_CATEGORY_COLOR = '#64748b'
+
 // Same hues as the default categories, so new ones sit well next to them.
 export const COLOR_SWATCHES = [
   { value: '#10b981', name: 'Emerald' },

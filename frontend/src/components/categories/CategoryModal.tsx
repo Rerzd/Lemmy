@@ -74,11 +74,11 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
       }
     >
       <form id={formId} onSubmit={onSubmit} className="space-y-4" noValidate>
-        <div className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-950 px-3 py-2.5">
+        <div className="flex items-center gap-3 rounded-control border border-border bg-bg px-3 py-2.5">
           <CategoryIcon icon={icon} color={color} />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-slate-200">{name.trim() || 'New category'}</p>
-            <p className="text-xs text-slate-500 capitalize">{type}</p>
+            <p className="truncate text-sm font-medium text-text">{name.trim() || 'New category'}</p>
+            <p className="text-xs text-text-muted capitalize">{type}</p>
           </div>
         </div>
 
@@ -115,15 +115,15 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
                   aria-label={swatch.name}
                   title={swatch.name}
                   onClick={() => setColor(swatch.value)}
-                  className="group flex size-11 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-violet-500 sm:size-8"
+                  className="group flex size-11 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-primary sm:size-8"
                 >
                   <span
-                    className={`flex size-8 items-center justify-center rounded-full ring-offset-2 ring-offset-slate-900 transition ${
-                      selected ? 'ring-2 ring-slate-100' : 'group-hover:scale-110'
+                    className={`flex size-8 items-center justify-center rounded-full ring-offset-2 ring-offset-surface transition ${
+                      selected ? 'ring-2 ring-text' : 'group-hover:scale-110'
                     }`}
                     style={{ backgroundColor: swatch.value }}
                   >
-                    {selected && <Check className="size-4 text-slate-950" strokeWidth={3} aria-hidden />}
+                    {selected && <Check className="size-4 text-ink" strokeWidth={3} aria-hidden />}
                   </span>
                 </button>
               )
@@ -146,10 +146,10 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
                   aria-label={iconLabel(key)}
                   title={iconLabel(key)}
                   onClick={() => setIcon(key)}
-                  className={`flex aspect-square items-center justify-center rounded-lg border transition-colors focus-visible:outline-2 focus-visible:outline-violet-500 ${
+                  className={`flex aspect-square items-center justify-center rounded-control border transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
                     selected
                       ? 'border-transparent'
-                      : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                      : 'border-border bg-bg text-text-muted hover:border-border-strong hover:text-text'
                   }`}
                   style={selected ? { backgroundColor: `${color}26`, color, boxShadow: `inset 0 0 0 1.5px ${color}` } : undefined}
                 >
@@ -161,7 +161,7 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
         </fieldset>
 
         {error && (
-          <p role="alert" className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+          <p role="alert" className="flex items-start gap-2 rounded-control border border-status-over/30 bg-status-over/10 px-3 py-2.5 text-sm text-status-over">
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
             {error}
           </p>

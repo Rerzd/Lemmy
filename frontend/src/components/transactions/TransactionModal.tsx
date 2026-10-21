@@ -83,7 +83,7 @@ export function TransactionModal({
       footer={
         <>
           {isEdit && (
-            <Button variant="ghost" className="mr-auto text-rose-400 hover:text-rose-300" onClick={() => onDelete(transaction)} disabled={saving}>
+            <Button variant="ghost" className="mr-auto text-status-over hover:bg-status-over/10 hover:text-status-over" onClick={() => onDelete(transaction)} disabled={saving}>
               <Trash2 className="size-4" aria-hidden />
               Delete
             </Button>
@@ -129,7 +129,7 @@ export function TransactionModal({
               required
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className={`${inputClass} [color-scheme:dark]`}
+              className={inputClass}
             />
           </div>
         </div>
@@ -152,9 +152,9 @@ export function TransactionModal({
               ))}
             </select>
           ) : (
-            <p className="rounded-lg border border-dashed border-slate-700 px-3 py-2.5 text-sm text-slate-400">
+            <p className="rounded-control border border-dashed border-border-strong px-3 py-2.5 text-sm text-text-muted">
               No {type} categories yet.{' '}
-              <Link to="/categories" className="font-medium text-violet-300 hover:text-violet-200">
+              <Link to="/categories" className="font-medium text-primary-text hover:underline">
                 Create one
               </Link>
             </p>
@@ -163,7 +163,7 @@ export function TransactionModal({
 
         <div>
           <label htmlFor={`${formId}-description`} className={labelClass}>
-            Description <span className="font-normal text-slate-500">(optional)</span>
+            Description <span className="font-normal text-text-muted">(optional)</span>
           </label>
           <input
             id={`${formId}-description`}
@@ -177,7 +177,7 @@ export function TransactionModal({
         </div>
 
         {error && (
-          <p role="alert" className="flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300">
+          <p role="alert" className="flex items-start gap-2 rounded-control border border-status-over/30 bg-status-over/10 px-3 py-2.5 text-sm text-status-over">
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
             {error}
           </p>

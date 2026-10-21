@@ -29,21 +29,21 @@ interface CategoryCardProps {
 
 function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
   return (
-    <li className="group flex items-center gap-1 rounded-xl border border-slate-800 bg-slate-900 pr-1.5 transition-colors hover:border-slate-700 sm:pr-3">
+    <li className="group flex items-center gap-1 rounded-surface border border-border bg-surface pr-1.5 transition-colors hover:border-border-strong sm:pr-3">
       <button
         type="button"
         onClick={onEdit}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-xl p-3 text-left focus-visible:outline-2 focus-visible:outline-violet-500"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-surface p-3 text-left focus-visible:outline-2 focus-visible:outline-primary"
       >
         <CategoryIcon icon={category.icon} color={category.color} />
-        <span className="truncate text-sm font-medium text-slate-200">{category.name}</span>
+        <span className="truncate text-sm font-medium text-text">{category.name}</span>
       </button>
       <div className="flex shrink-0 items-center">
         <button
           type="button"
           onClick={onEdit}
           aria-label={`Edit ${category.name}`}
-          className="flex size-11 items-center justify-center rounded-md text-slate-500 sm:size-8 hover:bg-slate-800 hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-violet-500"
+          className="flex size-11 items-center justify-center rounded-chip text-text-muted sm:size-8 hover:bg-surface-2 hover:text-text focus-visible:outline-2 focus-visible:outline-primary"
         >
           <Pencil className="size-4" aria-hidden />
         </button>
@@ -51,7 +51,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
           type="button"
           onClick={onDelete}
           aria-label={`Delete ${category.name}`}
-          className="flex size-11 items-center justify-center rounded-md text-slate-500 sm:size-8 hover:bg-slate-800 hover:text-rose-400 focus-visible:outline-2 focus-visible:outline-violet-500"
+          className="flex size-11 items-center justify-center rounded-chip text-text-muted sm:size-8 hover:bg-surface-2 hover:text-status-over focus-visible:outline-2 focus-visible:outline-primary"
         >
           <Trash2 className="size-4" aria-hidden />
         </button>
@@ -99,7 +99,7 @@ export function CategoriesPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">Group your transactions and budgets. Each one has its own color and icon.</p>
+        <p className="text-sm text-text-muted">Group your transactions and budgets. Each one has its own color and icon.</p>
         <Button onClick={() => setModal({ type: 'expense' })} className="shrink-0">
           <Plus className="size-4" aria-hidden />
           <span className="sm:hidden">Add</span>
@@ -112,9 +112,9 @@ export function CategoriesPage() {
         return (
           <section key={section.type} aria-labelledby={`section-${section.type}`}>
             <header className="mb-3 flex items-center justify-between">
-              <h2 id={`section-${section.type}`} className="text-sm font-semibold text-slate-200">
+              <h2 id={`section-${section.type}`} className="text-sm font-semibold text-text">
                 {section.title}
-                {items && <span className="ml-2 font-normal text-slate-500 tabular-nums">{items.length}</span>}
+                {items && <span className="ml-2 font-normal text-text-muted tabular-nums">{items.length}</span>}
               </h2>
               <Button variant="ghost" size="sm" onClick={() => setModal({ type: section.type })}>
                 <Plus className="size-4" aria-hidden />
@@ -125,11 +125,11 @@ export function CategoriesPage() {
             {!items ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {Array.from({ length: 3 }, (_, i) => (
-                  <Skeleton key={i} className="h-16 rounded-xl" />
+                  <Skeleton key={i} className="h-16 rounded-surface" />
                 ))}
               </div>
             ) : items.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-slate-800 px-4 py-6 text-center text-sm text-slate-400">{section.empty}</p>
+              <p className="rounded-surface border border-dashed border-border px-4 py-6 text-center text-sm text-text-muted">{section.empty}</p>
             ) : (
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((c) => (
@@ -159,7 +159,7 @@ export function CategoriesPage() {
       >
         {toDelete && (
           <p>
-            <span className="font-medium text-slate-100">{toDelete.name}</span> will be removed. Categories that still have
+            <span className="font-medium text-text">{toDelete.name}</span> will be removed. Categories that still have
             transactions or budgets can't be deleted until those are moved or removed.
           </p>
         )}

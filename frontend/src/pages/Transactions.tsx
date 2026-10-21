@@ -147,7 +147,7 @@ export function TransactionsPage() {
       <div className="flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center">
         <div className="flex gap-2 sm:gap-3 lg:contents">
           <div className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500" aria-hidden />
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-text-muted" aria-hidden />
             <input
               type="search"
               value={search}
@@ -161,7 +161,7 @@ export function TransactionsPage() {
                 type="button"
                 onClick={() => onSearch('')}
                 aria-label="Clear search"
-                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-slate-500 hover:text-slate-200 sm:w-9"
+                className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-control text-text-muted hover:text-text sm:w-9"
               >
                 <X className="size-3.5" aria-hidden />
               </button>
@@ -220,7 +220,7 @@ export function TransactionsPage() {
         ) : (
           <div className={`space-y-4 transition-opacity ${list.loading ? 'opacity-60' : ''}`} aria-busy={list.loading}>
             <TransactionList items={list.data.items} categoryById={categoryById} onEdit={setModal} onDelete={askDelete} />
-            <div className="border-t border-slate-800 pt-4">
+            <div className="border-t border-border pt-4">
               <Pagination page={page} pageSize={PAGE_SIZE} total={list.data.total} onChange={(p) => updateParams({ page: p })} />
             </div>
           </div>
@@ -248,7 +248,7 @@ export function TransactionsPage() {
       >
         {toDelete && (
           <p>
-            <span className="font-medium text-slate-100">{toDelete.description || 'This transaction'}</span> (
+            <span className="font-medium text-text">{toDelete.description || 'This transaction'}</span> (
             {formatSigned(toDelete.amount, toDelete.currency, toDelete.type)}) will be removed permanently. This can't be undone.
           </p>
         )}

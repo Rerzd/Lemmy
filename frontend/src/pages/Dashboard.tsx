@@ -21,7 +21,7 @@ import { formatMoney } from '../lib/money'
 
 function CardLink({ to, children }: { to: string; children: string }) {
   return (
-    <Link to={to} className="inline-flex items-center gap-1 text-xs font-medium text-violet-300 hover:text-violet-200">
+    <Link to={to} className="inline-flex items-center gap-1 text-xs font-medium text-primary-text hover:underline">
       {children}
       <ArrowRight className="size-3.5" aria-hidden />
     </Link>
@@ -55,7 +55,7 @@ export function DashboardPage() {
       )}
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-5">
-        <Card title="Income vs expenses" action={<span className="text-xs text-slate-500">Last 6 months</span>} className="lg:col-span-3">
+        <Card title="Income vs expenses" action={<span className="text-xs text-text-muted">Last 6 months</span>} className="lg:col-span-3">
           {trend.error ? (
             <ErrorState message={trend.error} onRetry={trend.reload} />
           ) : trend.data ? (
@@ -107,11 +107,11 @@ export function DashboardPage() {
                 <li key={b.budget_id}>
                   <div className="mb-1.5 flex items-center gap-2.5">
                     <CategoryIcon icon={b.icon} color={b.color} size="sm" />
-                    <span className="min-w-0 flex-1 truncate text-sm text-slate-200">{b.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-text">{b.name}</span>
                     <BudgetStatusLabel status={b.status} />
                   </div>
                   <BudgetProgress pct={b.pct_used} status={b.status} />
-                  <p className="mt-1 text-xs text-slate-500 tabular-nums">
+                  <p className="mt-1 text-xs text-text-muted tabular-nums">
                     {formatMoney(b.spent, currency)} of {formatMoney(b.budgeted, currency)} · {b.pct_used.toFixed(0)}%
                   </p>
                 </li>
@@ -133,7 +133,7 @@ export function DashboardPage() {
               action={
                 <Link
                   to={`/transactions${search}`}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-violet-600 px-3 text-sm font-medium text-white hover:bg-violet-500"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-control bg-primary px-3 text-sm font-medium text-primary-contrast hover:bg-primary-hover"
                 >
                   <Plus className="size-4" aria-hidden />
                   Add transaction
@@ -141,7 +141,7 @@ export function DashboardPage() {
               }
             />
           ) : (
-            <div className="-my-1 divide-y divide-slate-800">
+            <div className="-my-1 divide-y divide-border">
               {recent.data.items.map((t) => (
                 <TransactionItem key={t.id} transaction={t} category={categoryById.get(t.category_id)} />
               ))}

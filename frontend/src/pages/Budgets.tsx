@@ -29,10 +29,10 @@ function Summary({ budgets, currency }: { budgets: BudgetStatus[]; currency: str
   const counts = (['over', 'warning', 'ok'] as BudgetHealth[]).map((s) => [s, budgets.filter((b) => b.status === s).length] as const)
 
   // Full amounts from sm up; phones get the compact form so three columns fit.
-  const stat = (label: string, value: number, className = 'text-slate-100') => (
+  const stat = (label: string, value: number, className = 'text-text') => (
     <div className="min-w-0">
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className={`mt-0.5 truncate text-base font-semibold tabular-nums sm:text-lg ${className}`}>
+      <p className="text-xs text-text-muted">{label}</p>
+      <p className={`mt-0.5 truncate font-display text-base font-semibold sm:text-lg ${className}`}>
         <span className="sm:hidden">{formatMoney(value, currency, { compact: true })}</span>
         <span className="hidden sm:inline">{formatMoney(value, currency)}</span>
       </p>
@@ -44,13 +44,13 @@ function Summary({ budgets, currency }: { budgets: BudgetStatus[]; currency: str
       <div className="grid grid-cols-3 gap-3">
         {stat('Budgeted', budgeted)}
         {stat('Spent', spent)}
-        {budgeted - spent >= 0 ? stat('Left', budgeted - spent) : stat('Over', spent - budgeted, 'text-rose-400')}
+        {budgeted - spent >= 0 ? stat('Left', budgeted - spent) : stat('Over', spent - budgeted, 'text-status-over')}
       </div>
-      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-slate-800 pt-3 text-xs">
+      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3 text-xs">
         {counts.map(([status, n]) => {
           const { label, text, icon: Icon } = BUDGET_STATUS[status]
           return (
-            <li key={status} className={`inline-flex items-center gap-1 ${n ? text : 'text-slate-500'}`}>
+            <li key={status} className={`inline-flex items-center gap-1 ${n ? text : 'text-text-muted'}`}>
               <Icon className="size-3.5" aria-hidden />
               <span className="tabular-nums">{n}</span> {label.toLowerCase()}
             </li>
@@ -118,10 +118,10 @@ export function BudgetsPage() {
     <div className="space-y-4 sm:space-y-6">
       {!status.data ? (
         <>
-          <Skeleton className="h-32 w-full rounded-xl" />
+          <Skeleton className="h-32 w-full rounded-surface" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="h-44 rounded-xl" />
+              <Skeleton key={i} className="h-44 rounded-surface" />
             ))}
           </div>
         </>
@@ -139,9 +139,9 @@ export function BudgetsPage() {
           <Summary budgets={budgets} currency={currency} />
           <section aria-labelledby="budgets-heading" className={status.loading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
             <header className="mb-3 flex items-center justify-between gap-3">
-              <h2 id="budgets-heading" className="text-sm font-semibold text-slate-200">
+              <h2 id="budgets-heading" className="text-sm font-semibold text-text">
                 {monthLabel(period)}
-                <span className="ml-2 font-normal text-slate-500 tabular-nums">{budgets.length}</span>
+                <span className="ml-2 font-normal text-text-muted tabular-nums">{budgets.length}</span>
               </h2>
               {addButton}
             </header>
@@ -174,7 +174,7 @@ export function BudgetsPage() {
       >
         {toDelete && (
           <p>
-            The <span className="font-medium text-slate-100">{toDelete.name}</span> budget for {monthLabel(period)} will be
+            The <span className="font-medium text-text">{toDelete.name}</span> budget for {monthLabel(period)} will be
             removed. Your transactions stay as they are.
           </p>
         )}

@@ -74,7 +74,7 @@ export function LoginForm() {
       </div>
 
       {error && (
-        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300" role="alert">
+        <p className="rounded-control border border-status-over/30 bg-status-over/10 px-3 py-2 text-sm text-status-over" role="alert">
           {error}
         </p>
       )}
@@ -86,9 +86,9 @@ export function LoginForm() {
         Try the demo account
       </Button>
 
-      <p className="pt-1 text-center text-sm text-slate-400">
+      <p className="pt-1 text-center text-sm text-text-muted">
         Don't have an account?{' '}
-        <Link to="/register" className="font-medium text-violet-300 hover:text-violet-200">
+        <Link to="/register" className="font-medium text-primary-text hover:underline">
           Create one
         </Link>
       </p>

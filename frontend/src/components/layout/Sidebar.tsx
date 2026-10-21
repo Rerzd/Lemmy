@@ -11,7 +11,7 @@ export function Sidebar() {
   const { search } = useMonth()
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col border-r border-slate-800 bg-slate-950 sm:flex lg:w-60">
+    <aside className="sticky top-0 hidden h-dvh w-16 shrink-0 flex-col border-r border-border bg-bg sm:flex lg:w-60">
       <div className="flex h-16 items-center justify-center px-4 lg:justify-start lg:px-5">
         <span className="lg:hidden">
           <Logo withWordmark={false} />
@@ -29,14 +29,16 @@ export function Sidebar() {
             end={to === '/'}
             title={label}
             className={({ isActive }) =>
-              `flex h-10 items-center justify-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors lg:justify-start ${
-                isActive ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:bg-slate-900 hover:text-slate-100'
+              `relative flex h-10 items-center justify-center gap-3 rounded-control px-3 text-sm font-medium transition-colors lg:justify-start ${
+                isActive
+                  ? 'bg-surface text-text shadow-raised before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-full before:bg-primary'
+                  : 'text-text-muted hover:bg-surface hover:text-text'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon className={`size-4.5 shrink-0 ${isActive ? 'text-violet-400' : ''}`} aria-hidden />
+                <Icon className={`size-4.5 shrink-0 ${isActive ? 'text-primary-text' : ''}`} aria-hidden />
                 <span className="hidden lg:inline">{label}</span>
               </>
             )}
@@ -44,21 +46,21 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-slate-800 p-2 lg:p-3">
-        <div className="flex items-center gap-3 rounded-lg px-1 py-2 lg:px-2">
-          <span className="hidden size-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-xs font-semibold text-slate-200 lg:flex">
+      <div className="border-t border-border p-2 lg:p-3">
+        <div className="flex items-center gap-3 rounded-control px-1 py-2 lg:px-2">
+          <span className="hidden size-8 shrink-0 items-center justify-center rounded-full bg-surface-2 text-xs font-semibold text-text lg:flex">
             {user?.name.charAt(0).toUpperCase()}
           </span>
           <div className="hidden min-w-0 flex-1 lg:block">
-            <p className="truncate text-sm font-medium text-slate-200">{user?.name}</p>
-            <p className="truncate text-xs text-slate-500">{user?.email}</p>
+            <p className="truncate text-sm font-medium text-text">{user?.name}</p>
+            <p className="truncate text-xs text-text-muted">{user?.email}</p>
           </div>
           <button
             type="button"
             onClick={logout}
             title="Sign out"
             aria-label="Sign out"
-            className="mx-auto rounded-md p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100 lg:mx-0"
+            className="mx-auto rounded-chip p-2 text-text-muted hover:bg-surface-2 hover:text-text lg:mx-0"
           >
             <LogOut className="size-4" />
           </button>

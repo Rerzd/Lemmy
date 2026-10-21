@@ -8,7 +8,7 @@ export function MobileNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-slate-800 bg-slate-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
       aria-label="Main"
     >
       {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
@@ -17,13 +17,22 @@ export function MobileNav() {
           to={{ pathname: to, search }}
           end={to === '/'}
           className={({ isActive }) =>
-            `flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium ${
-              isActive ? 'text-violet-300' : 'text-slate-500'
+            `flex h-16 flex-col items-center justify-center gap-1 text-xs ${
+              isActive ? 'font-semibold text-text' : 'font-medium text-text-muted'
             }`
           }
         >
-          <Icon className="size-5" aria-hidden />
-          {label}
+          {({ isActive }) => (
+            <>
+              {/* Kiwi pill behind the active icon; ink keeps the glyph at 8:1. */}
+              <span
+                className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors ${isActive ? 'bg-highlight text-ink' : ''}`}
+              >
+                <Icon className="size-5" aria-hidden />
+              </span>
+              {label}
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

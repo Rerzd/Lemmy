@@ -1,6 +1,6 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import type { CategoryTotal } from '../../types/api'
-import { CHART_COLORS } from '../../lib/chartColors'
+import { useChartColors } from '../../hooks/useTheme'
 import { formatMoney } from '../../lib/money'
 import { CategoryIcon } from '../ui/CategoryIcon'
 
@@ -14,9 +14,9 @@ function SliceTooltip({ active, payload, currency }: SliceTooltipProps) {
   if (!active || !payload?.length) return null
   const row = payload[0].payload as CategoryTotal
   return (
-    <div className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs shadow-xl">
-      <p className="font-medium text-slate-200">{row.name}</p>
-      <p className="mt-0.5 text-slate-400 tabular-nums">
+    <div className="rounded-control border border-border bg-surface px-3 py-2 text-xs shadow-overlay">
+      <p className="font-medium text-text">{row.name}</p>
+      <p className="mt-0.5 text-text-muted tabular-nums">
         {formatMoney(row.total, currency)} · {(row.share * 100).toFixed(1)}%
       </p>
     </div>
@@ -24,6 +24,7 @@ function SliceTooltip({ active, payload, currency }: SliceTooltipProps) {
 }
 
 export function CategoryDonut({ rows, total, currency }: { rows: CategoryTotal[]; total: number; currency: string }) {
+  const colors = useChartColors()
   return (
     // Container query: side by side only when the card itself is wide enough for names.
     <div className="@container">
@@ -38,7 +39,7 @@ export function CategoryDonut({ rows, total, currency }: { rows: CategoryTotal[]
                 innerRadius="68%"
                 outerRadius="100%"
                 // The panel color as stroke draws a 2px gap between slices.
-                stroke={CHART_COLORS.surface}
+                stroke={colors.surface}
                 strokeWidth={2}
                 isAnimationActive={false}
               >
@@ -54,8 +55,8 @@ export function CategoryDonut({ rows, total, currency }: { rows: CategoryTotal[]
             </PieChart>
           </ResponsiveContainer>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span className="text-xs text-slate-500">Spent</span>
-            <span className="text-sm font-semibold text-slate-100 tabular-nums">
+            <span className="text-xs text-text-muted">Spent</span>
+            <span className="font-display text-base font-semibold text-text">
               {formatMoney(total, currency, { compact: true })}
             </span>
           </div>
@@ -66,9 +67,9 @@ export function CategoryDonut({ rows, total, currency }: { rows: CategoryTotal[]
           {rows.map((row) => (
             <li key={row.category_id} className="flex items-center gap-2.5 text-sm">
               <CategoryIcon icon={row.icon} color={row.color} size="sm" />
-              <span className="min-w-0 flex-1 truncate text-slate-300">{row.name}</span>
-              <span className="text-slate-100 tabular-nums">{formatMoney(row.total, currency)}</span>
-              <span className="w-12 text-right text-xs text-slate-500 tabular-nums">{(row.share * 100).toFixed(0)}%</span>
+              <span className="min-w-0 flex-1 truncate text-text">{row.name}</span>
+              <span className="text-text tabular-nums">{formatMoney(row.total, currency)}</span>
+              <span className="w-12 text-right text-xs text-text-muted tabular-nums">{(row.share * 100).toFixed(0)}%</span>
             </li>
           ))}
         </ul>

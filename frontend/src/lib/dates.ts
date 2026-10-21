@@ -43,3 +43,19 @@ export function formatDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
+
+// Day headings for grouped lists: "Today", "Yesterday", then "Mon, Oct 19" (year only if different).
+export function dayLabel(iso: string, today: Date = new Date()): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  const day = new Date(y, m - 1, d)
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const diff = Math.round((start.getTime() - day.getTime()) / 86_400_000)
+  if (diff === 0) return 'Today'
+  if (diff === 1) return 'Yesterday'
+  return day.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: y === today.getFullYear() ? undefined : 'numeric',
+  })
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, monthLabel, parseMonthParam, shiftMonth, toMonthParam } from './dates'
+import { dayLabel, formatDate, monthLabel, parseMonthParam, shiftMonth, toMonthParam } from './dates'
 
 describe('shiftMonth', () => {
   it('moves within a year', () => {
@@ -37,5 +37,18 @@ describe('labels', () => {
 
   it('formats ISO dates without shifting the day across time zones', () => {
     expect(formatDate('2026-01-01')).toBe('Jan 1, 2026')
+  })
+})
+
+describe('dayLabel', () => {
+  const today = new Date(2026, 9, 21)
+  it('names today and yesterday, then weekday and date', () => {
+    expect(dayLabel('2026-10-21', today)).toBe('Today')
+    expect(dayLabel('2026-10-20', today)).toBe('Yesterday')
+    expect(dayLabel('2026-10-19', today)).toBe('Mon, Oct 19')
+  })
+
+  it('adds the year only for other years', () => {
+    expect(dayLabel('2025-12-31', today)).toBe('Wed, Dec 31, 2025')
   })
 })

@@ -10,11 +10,12 @@ Lemmy records income and expenses by category, sets monthly budgets per category
 
 ## Features
 
-- **Dashboard**: income, expenses, net and savings rate with change vs last month; six-month income vs expenses chart; spending-by-category donut with a table-style legend; the five budgets closest to their limit; recent transactions.
-- **Transactions**: filter by type, category and description search (debounced), all kept in the URL; server-side pagination; add, edit and delete with the backend's validation messages shown in the form.
-- **Categories**: income and expense groups, each category with one of 10 colors and 14 icons; 11 sensible defaults created on sign-up.
-- **Budgets**: monthly limit per expense category with spent, remaining, percent used and a status (on track, close to limit, over budget) shown with an icon and a label, never color alone.
+- **Dashboard**: opens with one sentence about the month ("You have $ 589.700 left in your budgets, 11 days to go") and the figures behind it; spending by category as a ranked list with bars and budget status; recent transactions; a six-month income vs expenses chart.
+- **Transactions**: grouped by day, with the month's money in and out; filter by type, category and description search (debounced), all kept in the URL; server-side pagination; add, edit and delete with the backend's validation messages shown in the form.
+- **Categories**: income and expense side by side, each with this month's total, transaction count and a bar; 10 colors and 14 icons; 11 sensible defaults created on sign-up.
+- **Budgets**: monthly limit per expense category with spent, remaining, percent used and a status (on track, close to limit, over budget) shown with an icon and a label, never color alone. In the current month a tick on each bar marks an even pace, so it's clear which budgets are running ahead.
 - **Month navigation**: the selected month lives in `?month=YYYY-MM`, so every view can be bookmarked and shared.
+- **Light and dark themes**: follows the system by default, remembers a manual choice, and applies it before the first paint. Every text color meets WCAG AA in both themes (checked by a test).
 - **Responsive**: sidebar on desktop, bottom navigation on phones, and touch targets of at least 44 px on small screens.
 - **Demo account**: `demo@lemmy.app` / `demo1234`, one click from the login page.
 
@@ -24,7 +25,7 @@ Lemmy records income and expenses by category, sets monthly budgets per category
 |---|---|
 | Backend | Python, FastAPI, SQLAlchemy 2, Alembic, Pydantic 2, JWT (python-jose) with bcrypt password hashing |
 | Database | SQLite (single file, foreign keys enforced) |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, React Router 7, Recharts, lucide-react icons, sonner toasts, axios |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS 4 with design tokens, React Router 7, Recharts, lucide-react icons, sonner toasts, axios, self-hosted Bricolage Grotesque and Instrument Sans |
 | Tests | pytest + httpx (API), Vitest + Testing Library (frontend) |
 | Tooling | npm scripts with `concurrently`, ESLint, optional Docker Compose |
 
@@ -199,7 +200,7 @@ Lemmy uses a single SQLite file on purpose: there's no database server to instal
 | Suite | Tests | Covers |
 |---|---|---|
 | Backend (pytest + httpx) | **29** | Auth, business rules (amounts, type/category match, currency, budget uniqueness, protected deletes), transaction filters and pagination, default categories, summary math, the demo seed |
-| Frontend (Vitest + Testing Library) | **37** | Month math and the `?month` URL param, money formatting, API error messages, palette and status helpers, the `useMonth` hook, progress bar, pagination and segmented control |
+| Frontend (Vitest + Testing Library) | **116** | Month math, the `?month` URL param and day labels, the dashboard sentence, money formatting, API error messages, the theme logic, WCAG contrast of every design token in both themes, palette and status helpers, progress bar, pagination and segmented control |
 
 ```bash
 npm test             # both suites
@@ -246,12 +247,14 @@ npm run test:web     # frontend only
 
 | | |
 |---|---|
-| ![Login](docs/screenshots/login.png) | ![Transactions](docs/screenshots/transactions.png) |
-| Login with one-click demo access | Transactions with filters and pagination |
-| ![Add transaction](docs/screenshots/transaction-modal.png) | ![Categories](docs/screenshots/categories.png) |
-| Adding a transaction | Categories with colors and icons |
-| ![Budgets](docs/screenshots/budgets.png) | <img src="docs/screenshots/dashboard-mobile.png" alt="Dashboard on a phone" width="220"> |
-| Budgets with status per category | Dashboard on a 375 px phone |
+| ![Transactions](docs/screenshots/transactions.png) | ![Budgets](docs/screenshots/budgets.png) |
+| Transactions grouped by day | Budgets with an even-pace marker |
+| ![Categories](docs/screenshots/categories.png) | ![Add transaction](docs/screenshots/transaction-modal.png) |
+| Categories with this month's activity | Adding a transaction |
+| ![Dashboard in the dark theme](docs/screenshots/dashboard-dark.png) | <img src="docs/screenshots/dashboard-mobile.png" alt="Dashboard on a phone" width="220"> |
+| Dark theme | Dashboard on a 375 px phone |
+| ![Login](docs/screenshots/login.png) | |
+| Login with one-click demo access | |
 
 ## Roadmap
 

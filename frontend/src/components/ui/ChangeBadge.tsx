@@ -10,7 +10,7 @@ interface ChangeBadgeProps {
 export function ChangeBadge({ value, upIsGood = true, suffix = '%' }: ChangeBadgeProps) {
   if (value === null || Math.abs(value) < 0.05) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500">
+      <span className="inline-flex items-center gap-1 text-xs font-medium text-text-muted">
         <Minus className="size-3.5" aria-hidden />
         {value === null ? 'No prior data' : 'No change'}
       </span>
@@ -21,7 +21,7 @@ export function ChangeBadge({ value, upIsGood = true, suffix = '%' }: ChangeBadg
   const Icon = up ? ArrowUpRight : ArrowDownRight
   return (
     <span
-      className={`inline-flex items-center gap-0.5 text-xs font-medium tabular-nums ${good ? 'text-emerald-400' : 'text-rose-400'}`}
+      className={`inline-flex items-center gap-0.5 text-xs font-medium tabular-nums ${good ? 'text-status-ok' : 'text-status-over'}`}
     >
       <Icon className="size-3.5" aria-hidden />
       {up ? '+' : ''}

@@ -13,7 +13,7 @@ export function SegmentedControl<T extends string>({ label, value, options, onCh
     <div
       role="radiogroup"
       aria-label={label}
-      className={`inline-flex h-[50px] rounded-lg border border-slate-800 bg-slate-950 p-0.5 sm:h-10 sm:p-1 ${className}`}
+      className={`inline-flex h-[50px] rounded-control border border-border bg-bg p-0.5 sm:h-10 sm:p-1 ${className}`}
     >
       {options.map((option) => {
         const selected = option.value === value
@@ -24,8 +24,8 @@ export function SegmentedControl<T extends string>({ label, value, options, onCh
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-violet-500 ${
-              selected ? 'bg-slate-800 text-slate-100' : 'text-slate-400 hover:text-slate-200'
+            className={`flex-1 rounded-chip px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-primary ${
+              selected ? 'bg-surface font-semibold text-text shadow-raised ring-1 ring-border-strong' : 'text-text-muted hover:text-text'
             }`}
           >
             {option.label}

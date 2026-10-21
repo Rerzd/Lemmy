@@ -4,7 +4,7 @@ import { BUDGET_STATUS } from '../../lib/budgetStatus'
 export function BudgetProgress({ pct, status }: { pct: number; status: BudgetHealth }) {
   return (
     <div
-      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800"
+      className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2"
       role="progressbar"
       aria-valuenow={Math.round(pct)}
       aria-valuemin={0}

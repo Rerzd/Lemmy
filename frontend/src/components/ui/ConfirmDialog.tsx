@@ -38,7 +38,7 @@ export function ConfirmDialog({
         </>
       }
     >
-      <div className="text-sm text-slate-300">{children}</div>
+      <div className="text-sm text-text">{children}</div>
     </Modal>
   )
 }

@@ -5,10 +5,10 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger'
 type Size = 'sm' | 'md'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-violet-600 text-white hover:bg-violet-500',
-  secondary: 'bg-slate-800 text-slate-100 border border-slate-700 hover:bg-slate-700',
-  ghost: 'text-slate-300 hover:bg-slate-800 hover:text-slate-100',
-  danger: 'bg-rose-600 text-white hover:bg-rose-500',
+  primary: 'bg-primary text-primary-contrast hover:bg-primary-hover',
+  secondary: 'bg-surface-2 text-text border border-border-strong hover:bg-border',
+  ghost: 'text-text hover:bg-surface-2 hover:text-text',
+  danger: 'bg-danger text-danger-contrast hover:bg-danger-hover',
 }
 
 const SIZES: Record<Size, string> = {
@@ -37,7 +37,7 @@ export function Button({
     <button
       type={type}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center rounded-lg font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-500 disabled:opacity-50 disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-control font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...props}
     >
       {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden />}

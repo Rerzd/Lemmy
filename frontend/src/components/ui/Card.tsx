@@ -10,10 +10,10 @@ interface CardProps {
 // The standard panel: one step lighter than the page, hairline border.
 export function Card({ title, action, className = '', children }: CardProps) {
   return (
-    <section className={`rounded-xl border border-slate-800 bg-slate-900 ${className}`}>
+    <section className={`rounded-surface border border-border bg-surface ${className}`}>
       {(title || action) && (
         <header className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
-          {title && <h2 className="text-sm font-semibold text-slate-200">{title}</h2>}
+          {title && <h2 className="text-sm font-semibold text-text">{title}</h2>}
           {action}
         </header>
       )}

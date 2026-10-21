@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 import { Plus, Target } from 'lucide-react'
 import { deleteBudget, getBudgetStatus } from '../api/budgets'
 import { listCategories } from '../api/categories'
-import { BudgetCard } from '../components/budgets/BudgetCard'
+import { BudgetRow } from '../components/budgets/BudgetRow'
 import { BudgetModal } from '../components/budgets/BudgetModal'
+import { BudgetProgress } from '../components/ui/BudgetProgress'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
@@ -15,49 +16,75 @@ import { useAsync } from '../hooks/useAsync'
 import { useCurrency } from '../hooks/useAuth'
 import { useMonth } from '../hooks/useMonth'
 import { BUDGET_STATUS } from '../lib/budgetStatus'
-import { monthLabel } from '../lib/dates'
+import { monthLabel, type YearMonth } from '../lib/dates'
 import { getErrorMessage } from '../lib/errors'
 import { formatMoney } from '../lib/money'
+import { daysLeft, monthProgress, periodKind } from '../lib/period'
 import type { BudgetHealth, BudgetStatus } from '../types/api'
 
 // "null" = closed, "new" = create, otherwise the budget being edited.
 type ModalState = null | 'new' | BudgetStatus
 
-function Summary({ budgets, currency }: { budgets: BudgetStatus[]; currency: string }) {
+interface PlanProps {
+  budgets: BudgetStatus[]
+  period: YearMonth
+  pace: number | undefined
+  currency: string
+}
+
+// The month's plan in one sentence, then the totals and one bar for all budgets together.
+function Plan({ budgets, period, pace, currency }: PlanProps) {
   const budgeted = budgets.reduce((sum, b) => sum + b.budgeted, 0)
   const spent = budgets.reduce((sum, b) => sum + b.spent, 0)
-  const counts = (['over', 'warning', 'ok'] as BudgetHealth[]).map((s) => [s, budgets.filter((b) => b.status === s).length] as const)
-
-  // Full amounts from sm up; phones get the compact form so three columns fit.
-  const stat = (label: string, value: number, className = 'text-text') => (
-    <div className="min-w-0">
-      <p className="text-xs text-text-muted">{label}</p>
-      <p className={`mt-0.5 truncate font-display text-base font-semibold sm:text-lg ${className}`}>
-        <span className="sm:hidden">{formatMoney(value, currency, { compact: true })}</span>
-        <span className="hidden sm:inline">{formatMoney(value, currency)}</span>
-      </p>
-    </div>
+  const left = budgeted - spent
+  const pct = budgeted ? (spent / budgeted) * 100 : 0
+  const overall: BudgetHealth = pct > 100 ? 'over' : pct >= 80 ? 'warning' : 'ok'
+  const kind = periodKind(period, new Date())
+  const n = daysLeft(period, new Date())
+  const count = `${budgets.length} budget${budgets.length === 1 ? '' : 's'}`
+  const amount = (
+    <strong className={`font-bold whitespace-nowrap ${left < 0 ? 'text-status-over' : 'text-status-ok'}`}>{formatMoney(Math.abs(left), currency)}</strong>
   )
+  const when = kind === 'current' ? (n === 1 ? ', last day of the month.' : `, ${n} days to go.`) : kind === 'future' ? ', before the month starts.' : ` at the end of ${monthLabel(period)}.`
 
   return (
-    <Card>
-      <div className="grid grid-cols-3 gap-3">
-        {stat('Budgeted', budgeted)}
-        {stat('Spent', spent)}
-        {budgeted - spent >= 0 ? stat('Left', budgeted - spent) : stat('Over', spent - budgeted, 'text-status-over')}
+    <section className="rounded-surface border border-border bg-surface shadow-raised" aria-labelledby="plan">
+      <div className="p-5 sm:p-7">
+        <p className="text-xs font-semibold tracking-wide text-primary-text uppercase">{monthLabel(period)}</p>
+        <h2 id="plan" className="mt-2 max-w-3xl text-xl leading-snug font-semibold text-balance text-text sm:text-2xl">
+          {amount} {left < 0 ? 'over' : 'left'} across {count}
+          {when}
+        </h2>
+        <div className="mt-5">
+          <BudgetProgress pct={pct} status={overall} pace={pace} />
+          <p className="mt-1.5 flex flex-wrap justify-between gap-x-4 gap-y-1 text-sm text-text-muted">
+            <span>
+              <span className="font-semibold text-text">{formatMoney(spent, currency)}</span> spent of{' '}
+              <span className="font-semibold text-text">{formatMoney(budgeted, currency)}</span>
+            </span>
+            <span>{pct.toFixed(0)}% used</span>
+          </p>
+        </div>
       </div>
-      <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3 text-xs">
-        {counts.map(([status, n]) => {
-          const { label, text, icon: Icon } = BUDGET_STATUS[status]
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 border-t border-border px-5 py-3 text-xs sm:px-7">
+        {(['over', 'warning', 'ok'] as BudgetHealth[]).map((s) => {
+          const n = budgets.filter((b) => b.status === s).length
+          const { label, text, icon: Icon } = BUDGET_STATUS[s]
           return (
-            <li key={status} className={`inline-flex items-center gap-1 ${n ? text : 'text-text-muted'}`}>
+            <li key={s} className={`inline-flex items-center gap-1 ${n ? text : 'text-text-muted'}`}>
               <Icon className="size-3.5" aria-hidden />
-              <span className="tabular-nums">{n}</span> {label.toLowerCase()}
+              <span>{n}</span> {label.toLowerCase()}
             </li>
           )
         })}
+        {pace !== undefined && (
+          <li className="inline-flex items-center gap-1.5 text-text-muted sm:ml-auto">
+            <span className="h-3 w-0.5 rounded-full bg-text" aria-hidden />
+            Even pace: {Math.round(pace * 100)}% of the month is behind you
+          </li>
+        )}
       </ul>
-    </Card>
+    </section>
   )
 }
 
@@ -73,10 +100,11 @@ export function BudgetsPage() {
   const [toDelete, setToDelete] = useState<BudgetStatus | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  // Most-used first, so budgets that need attention lead the page.
   const budgets = [...(status.data ?? [])].sort((a, b) => b.pct_used - a.pct_used)
   const taken = new Set(budgets.map((b) => b.category_id))
   const available = (categories.data ?? []).filter((c) => c.type === 'expense' && !taken.has(c.id))
+  // Only the running month has a pace to compare against.
+  const pace = periodKind(period, new Date()) === 'current' ? monthProgress(period, new Date()) : undefined
 
   const onSaved = (created: boolean) => {
     setModal(null)
@@ -118,12 +146,8 @@ export function BudgetsPage() {
     <div className="space-y-4 sm:space-y-6">
       {!status.data ? (
         <>
-          <Skeleton className="h-32 w-full rounded-surface" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="h-44 rounded-surface" />
-            ))}
-          </div>
+          <Skeleton className="h-48 w-full rounded-surface" />
+          <Skeleton className="h-80 w-full rounded-surface" />
         </>
       ) : budgets.length === 0 ? (
         <Card>
@@ -136,18 +160,29 @@ export function BudgetsPage() {
         </Card>
       ) : (
         <>
-          <Summary budgets={budgets} currency={currency} />
-          <section aria-labelledby="budgets-heading" className={status.loading ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
-            <header className="mb-3 flex items-center justify-between gap-3">
-              <h2 id="budgets-heading" className="text-sm font-semibold text-text">
-                {monthLabel(period)}
-                <span className="ml-2 font-normal text-text-muted tabular-nums">{budgets.length}</span>
+          <Plan budgets={budgets} period={period} pace={pace} currency={currency} />
+          <section
+            aria-labelledby="budgets-heading"
+            className={`rounded-surface border border-border bg-surface transition-opacity ${status.loading ? 'opacity-60' : ''}`}
+          >
+            <header className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+              <h2 id="budgets-heading" className="text-lg font-semibold text-text">
+                Budgets
+                <span className="ml-2 font-sans text-sm font-normal text-text-muted">{budgets.length}</span>
               </h2>
               {addButton}
             </header>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Most used first, so the budgets that need attention lead. */}
+            <ul className="divide-y divide-border px-3 py-1">
               {budgets.map((b) => (
-                <BudgetCard key={b.budget_id} budget={b} currency={currency} onEdit={() => setModal(b)} onDelete={() => setToDelete(b)} />
+                <BudgetRow
+                  key={b.budget_id}
+                  budget={b}
+                  currency={currency}
+                  pace={pace}
+                  onEdit={() => setModal(b)}
+                  onDelete={() => setToDelete(b)}
+                />
               ))}
             </ul>
           </section>

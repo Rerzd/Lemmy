@@ -32,6 +32,7 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
   const [type, setType] = useState<TxType>(category?.type ?? defaultType)
   const [color, setColor] = useState(category?.color ?? COLOR_SWATCHES[0].value)
   const [icon, setIcon] = useState(category?.icon ?? 'tag')
+  const [isFixed, setIsFixed] = useState(category?.is_fixed ?? false)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -46,7 +47,7 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
 
     setError(null)
     setSaving(true)
-    const payload = { name: name.trim(), type, color, icon }
+    const payload = { name: name.trim(), type, color, icon, is_fixed: type === 'expense' && isFixed }
     try {
       const saved = isEdit ? await updateCategory(category.id, payload) : await createCategory(payload)
       onSaved(saved, !isEdit)
@@ -100,6 +101,42 @@ export function CategoryModal({ category, defaultType, onClose, onSaved }: Categ
             className={inputClass}
           />
         </div>
+
+        {type === 'expense' && (
+          <div className="flex items-start justify-between gap-4 rounded-control border border-border px-3 py-2">
+            <div className="min-w-0 py-1">
+              <p id={`${formId}-fixed-label`} className="text-sm font-medium text-text">
+                Fixed monthly cost
+              </p>
+              <p id={`${formId}-fixed-help`} className="text-xs text-text-muted">
+                Rent, utilities, subscriptions: about the same every month. Reports split living costs into fixed and variable.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isFixed}
+              aria-labelledby={`${formId}-fixed-label`}
+              aria-describedby={`${formId}-fixed-help`}
+              onClick={() => setIsFixed((v) => !v)}
+              className="flex size-11 shrink-0 items-center justify-center rounded-chip focus-visible:outline-2 focus-visible:outline-primary"
+            >
+              {/* The knob position shows the state (not only the fill color); role="switch" announces it. */}
+              <span
+                className={`relative inline-flex h-6 w-10 items-center rounded-full border transition-colors ${
+                  isFixed ? 'border-primary bg-primary' : 'border-border-strong bg-surface-2'
+                }`}
+                aria-hidden
+              >
+                <span
+                  className={`absolute size-4.5 rounded-full shadow-raised transition-transform ${
+                    isFixed ? 'translate-x-[1.125rem] bg-primary-contrast' : 'translate-x-0.5 bg-text-muted'
+                  }`}
+                />
+              </span>
+            </button>
+          </div>
+        )}
 
         <fieldset>
           <legend className={labelClass}>Color</legend>

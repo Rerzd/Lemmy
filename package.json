@@ -4,13 +4,13 @@
   "description": "Personal finance tracker: FastAPI + SQLite backend, React + Vite frontend.",
   "license": "MIT",
   "scripts": {
-    "setup": "npm install && npm --prefix frontend install && python -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt && npm run db:migrate && npm run db:seed",
-    "dev": "concurrently -n api,web -c cyan,magenta --kill-others-on-fail \"python -m uvicorn app.main:app --reload --app-dir backend --reload-dir backend --port 8000\" \"npm --prefix frontend run dev\"",
-    "db:migrate": "cd backend && python -m alembic upgrade head",
-    "db:seed": "cd backend && python -m app.scripts.seed_demo",
+    "setup": "npm install && npm --prefix frontend install && node scripts/py.mjs --ensure-venv -m pip install -r backend/requirements.txt -r backend/requirements-dev.txt && npm run db:migrate && npm run db:seed",
+    "dev": "concurrently -n api,web -c cyan,magenta --kill-others-on-fail \"node scripts/py.mjs -m uvicorn app.main:app --reload --app-dir backend --reload-dir backend --port 8000\" \"npm --prefix frontend run dev\"",
+    "db:migrate": "cd backend && node ../scripts/py.mjs -m alembic upgrade head",
+    "db:seed": "cd backend && node ../scripts/py.mjs -m app.scripts.seed_demo",
     "db:reset": "node -e \"require('fs').rmSync('backend/data/lemmy.db', { force: true })\" && npm run db:migrate && npm run db:seed",
     "test": "npm run test:api && npm run test:web",
-    "test:api": "python -m pytest backend/tests",
+    "test:api": "node scripts/py.mjs -m pytest backend/tests",
     "test:web": "npm --prefix frontend test"
   },
   "devDependencies": {

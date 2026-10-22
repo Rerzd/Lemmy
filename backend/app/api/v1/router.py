@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.routes import auth, categories, transactions, budgets, summary
+from app.api.v1.routes import auth, categories, transactions, budgets, summary, reports
 
 router = APIRouter()
 
@@ -8,3 +8,4 @@ router.include_router(categories.router,   prefix="/categories",   tags=["Catego
 router.include_router(transactions.router, prefix="/transactions",  tags=["Transactions"])
 router.include_router(budgets.router,      prefix="/budgets",       tags=["Budgets"])
 router.include_router(summary.router,      prefix="/summary",       tags=["Summary"])
+router.include_router(reports.router,      prefix="/reports",       tags=["Reports"])

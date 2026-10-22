@@ -31,6 +31,7 @@ def create_category(
         type=body.type,
         color=body.color,
         icon=body.icon,
+        is_fixed=body.is_fixed,
     )
 
 
@@ -59,6 +60,7 @@ def update_category(
         type=body.type,
         color=body.color,
         icon=body.icon,
+        is_fixed=body.is_fixed,
     )
 
 

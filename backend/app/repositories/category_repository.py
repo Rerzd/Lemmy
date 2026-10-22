@@ -14,8 +14,10 @@ def get_by_id(db: Session, category_id: int, user_id: int) -> Category | None:
     )
 
 
-def create(db: Session, user_id: int, name: str, type: str, color: str, icon: str) -> Category:
-    category = Category(user_id=user_id, name=name, type=type, color=color, icon=icon)
+def create(
+    db: Session, user_id: int, name: str, type: str, color: str, icon: str, is_fixed: bool = False
+) -> Category:
+    category = Category(user_id=user_id, name=name, type=type, color=color, icon=icon, is_fixed=is_fixed)
     db.add(category)
     db.commit()
     db.refresh(category)
@@ -30,11 +32,14 @@ def create_many(db: Session, user_id: int, categories: list[dict]) -> list[Categ
     return rows
 
 
-def update(db: Session, category: Category, name: str, type: str, color: str, icon: str) -> Category:
+def update(
+    db: Session, category: Category, name: str, type: str, color: str, icon: str, is_fixed: bool = False
+) -> Category:
     category.name = name
     category.type = type
     category.color = color
     category.icon = icon
+    category.is_fixed = is_fixed
     db.commit()
     db.refresh(category)
     return category

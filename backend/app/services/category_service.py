@@ -15,6 +15,15 @@ def _validate_type(type: str) -> None:
         )
 
 
+def _validate_fixed(type: str, is_fixed: bool) -> None:
+    # Income isn't a cost, so "fixed" only applies to expense categories.
+    if is_fixed and type != "expense":
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Only expense categories can be marked as a fixed monthly cost.",
+        )
+
+
 def _get_or_404(db: Session, category_id: int, user_id: int) -> Category:
     category = category_repository.get_by_id(db, category_id, user_id)
     if not category:
@@ -26,15 +35,28 @@ def list_categories(db: Session, user_id: int) -> list[Category]:
     return category_repository.get_all_by_user(db, user_id)
 
 
-def create_category(db: Session, user_id: int, name: str, type: str, color: str, icon: str) -> Category:
+def create_category(
+    db: Session, user_id: int, name: str, type: str, color: str, icon: str, is_fixed: bool = False
+) -> Category:
     _validate_type(type)
-    return category_repository.create(db, user_id=user_id, name=name, type=type, color=color, icon=icon)
+    _validate_fixed(type, is_fixed)
+    return category_repository.create(
+        db, user_id=user_id, name=name, type=type, color=color, icon=icon, is_fixed=is_fixed
+    )
 
 
 def update_category(
-    db: Session, user_id: int, category_id: int, name: str, type: str, color: str, icon: str
+    db: Session,
+    user_id: int,
+    category_id: int,
+    name: str,
+    type: str,
+    color: str,
+    icon: str,
+    is_fixed: bool = False,
 ) -> Category:
     _validate_type(type)
+    _validate_fixed(type, is_fixed)
     category = _get_or_404(db, category_id, user_id)
     # Flipping the type would leave existing transactions contradicting their category.
     if type != category.type and transaction_repository.count_by_category(db, category.id):
@@ -42,7 +64,9 @@ def update_category(
             status_code=status.HTTP_409_CONFLICT,
             detail="Can't change the type of a category that already has transactions.",
         )
-    return category_repository.update(db, category, name=name, type=type, color=color, icon=icon)
+    return category_repository.update(
+        db, category, name=name, type=type, color=color, icon=icon, is_fixed=is_fixed
+    )
 
 
 def _plural(count: int, word: str) -> str:

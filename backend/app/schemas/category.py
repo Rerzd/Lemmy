@@ -15,6 +15,8 @@ class CategoryCreate(BaseModel):
     color: str = Field(DEFAULT_COLOR, pattern=HEX_COLOR)
     # Only icons the frontend can render; anything else is a 422.
     icon: Icon = DEFAULT_ICON
+    # Fixed monthly cost; only expense categories can be fixed (the service checks it).
+    is_fixed: bool = False
 
 
 class CategoryUpdate(BaseModel):
@@ -22,6 +24,7 @@ class CategoryUpdate(BaseModel):
     type: Literal["income", "expense"]
     color: str = Field(DEFAULT_COLOR, pattern=HEX_COLOR)
     icon: Icon = DEFAULT_ICON
+    is_fixed: bool = False
 
 
 class CategoryResponse(BaseModel):
@@ -31,5 +34,6 @@ class CategoryResponse(BaseModel):
     type: str
     color: str
     icon: str
+    is_fixed: bool
 
     model_config = {"from_attributes": True}

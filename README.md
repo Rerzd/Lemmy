@@ -13,6 +13,7 @@ Lemmy records income and expenses by category, sets monthly budgets per category
 - **Dashboard**: opens with one sentence about the month ("You have $ 589.700 left in your budgets, 11 days to go") and the figures behind it; spending by category as a ranked list with bars and budget status; recent transactions; a six-month income vs expenses chart.
 - **Transactions**: grouped by day, with the month's money in and out; filter by type, category and description search (debounced), all kept in the URL; server-side pagination; add, edit and delete with the backend's validation messages shown in the form.
 - **Categories**: income and expense side by side, each with this month's total, transaction count and a bar; 10 colors and 14 icons; 11 sensible defaults created on sign-up.
+- **Reports**: what it costs to live each month, opening with a sentence ("Living costs about $4,6 M a month. $2 M is fixed.") and how long savings would last; fixed and variable costs as two lists; this month vs the usual month per category; spending by month; CSV export of the month's transactions.
 - **Budgets**: monthly limit per expense category with spent, remaining, percent used and a status (on track, close to limit, over budget) shown with an icon and a label, never color alone. In the current month a tick on each bar marks an even pace, so it's clear which budgets are running ahead.
 - **Month navigation**: the selected month lives in `?month=YYYY-MM`, so every view can be bookmarked and shared.
 - **Light and dark themes**: follows the system by default, remembers a manual choice, and applies it before the first paint. Every text color meets WCAG AA in both themes (checked by a test).
@@ -84,6 +85,7 @@ erDiagram
         string type "income or expense"
         string color "hex, e.g. #f97316"
         string icon "one of 14 keys"
+        bool is_fixed "fixed monthly cost, expenses only"
     }
     TRANSACTIONS {
         int id PK
@@ -117,13 +119,11 @@ You need **Python 3.12+** and **Node.js 22+**.
 git clone https://github.com/Rerzd/Lemmy.git
 cd Lemmy
 
-# A virtual environment puts `python` on your PATH for the npm scripts.
-python3 -m venv backend/.venv
-source backend/.venv/bin/activate        # Windows: backend\.venv\Scripts\activate
-
-npm run setup    # installs both apps, creates the database and seeds the demo user
+npm run setup    # creates backend/.venv, installs both apps, creates the database and seeds the demo user
 npm run dev      # API on http://localhost:8000, web app on http://localhost:5173
 ```
+
+There's no virtualenv to activate: the npm scripts run Python through `scripts/py.mjs`, which uses `backend/.venv` when it exists and falls back to `python3` / `python` otherwise. Set `LEMMY_PYTHON` to use a specific interpreter.
 
 Open http://localhost:5173 and click **Try the demo account**. Interactive API docs are at http://localhost:8000/docs.
 
@@ -131,7 +131,7 @@ No `.env` is needed: every setting has a working development default. To change 
 
 | Script | What it does |
 |---|---|
-| `npm run setup` | Install root, frontend and backend dependencies, migrate and seed |
+| `npm run setup` | Create `backend/.venv` if needed, install root, frontend and backend dependencies, migrate and seed |
 | `npm run dev` | Run API and web app together, with reload |
 | `npm run db:migrate` | `alembic upgrade head` |
 | `npm run db:seed` | Create or reset the demo user and its data |
@@ -167,6 +167,9 @@ All endpoints are under `/api/v1`. Everything except register and login needs an
 | GET | `/summary/overview` | Income, expenses, net, savings rate and change vs the previous month |
 | GET | `/summary/by-category` | Totals and share per category for a month (`type`, default `expense`) |
 | GET | `/summary/trend` | Income, expenses and net for the last `months` months (1 to 24, default 6), including empty months |
+| GET | `/reports/living-costs` | `month=YYYY-MM`: this month's expenses split into fixed and variable, the usual month (average of up to 3 complete months before it, with `months_used`), income needed to cover it, savings and how many months they cover |
+| GET | `/reports/category-spending` | `from` / `to` as `YYYY-MM` (up to 24 months, default the last 6): expenses per category per month, zero-filled |
+| GET | `/reports/export.csv` | `month=YYYY-MM`: that month's transactions as CSV (date, description, category, type, amount) |
 
 `month` and `year` default to the current month on the `/summary/*` endpoints and `/budgets/status`.
 
@@ -182,13 +185,17 @@ The API enforces these, and the frontend shows its messages as they come back:
 - **Budget status:** under 80 % used is *on track*, 80 to 100 % is *close to limit*, over 100 % is *over budget*.
 - **Percent changes** compare against the previous month and divide by its absolute value, so a net going from -100 to -50 counts as an improvement. When the previous value is zero the change is `null` rather than infinity.
 - **Savings rate** is net divided by income, and `null` in a month without income.
+- **Fixed costs:** only expense categories can be marked as a fixed monthly cost (`422` otherwise). New accounts start with Housing and Utilities marked as fixed.
+- **Living-costs baseline:** the average of up to 3 complete months before the report month. A month counts once it's over and on or after the user's first transaction, so a new account isn't averaged against empty months; `months_used` says how many were averaged. With no history the baseline, income needed and cushion are `null`, not `0`.
+- **Cushion:** all-time income minus all-time expenses (never below 0), divided by the monthly baseline; `null` when the baseline is `0`.
+- **CSV export:** fields with commas, quotes or newlines are quoted (RFC 4180); text cells starting with `=`, `+`, `-`, `@`, tab or carriage return get a leading `'` so spreadsheets don't run them as formulas. The file starts with a UTF-8 BOM so Excel reads accents correctly.
 
 ## Local database
 
 Lemmy uses a single SQLite file on purpose: there's no database server to install, and the whole state is one file you can delete.
 
 - **Location:** `backend/data/lemmy.db`, created on the first migration. The `backend/data/` folder is ignored by git. The path is resolved relative to `backend/`, so it's the same file whichever directory you start the API from.
-- **Schema:** a single Alembic baseline migration (`backend/alembic/versions/0001_baseline.py`) creates everything. Migrations run in batch mode so later `ALTER`s also work on SQLite.
+- **Schema:** Alembic migrations in `backend/alembic/versions/`: `0001_baseline.py` creates the tables and `0002_category_is_fixed.py` adds the fixed-cost flag. Migrations run in batch mode so `ALTER`s also work on SQLite.
 - **Integrity:** every connection runs `PRAGMA foreign_keys=ON`, so foreign keys are actually enforced.
 - **Reset:** `npm run db:reset` deletes the file and rebuilds it with fresh demo data. The demo data is generated relative to today, so the dashboard always has the last six months filled in.
 - **Inspect:** `sqlite3 backend/data/lemmy.db ".tables"`, or open the file in any SQLite browser.
@@ -199,8 +206,8 @@ Lemmy uses a single SQLite file on purpose: there's no database server to instal
 
 | Suite | Tests | Covers |
 |---|---|---|
-| Backend (pytest + httpx) | **29** | Auth, business rules (amounts, type/category match, currency, budget uniqueness, protected deletes), transaction filters and pagination, default categories, summary math, the demo seed |
-| Frontend (Vitest + Testing Library) | **116** | Month math, the `?month` URL param and day labels, the dashboard sentence, money formatting, API error messages, the theme logic, WCAG contrast of every design token in both themes, palette and status helpers, progress bar, pagination and segmented control |
+| Backend (pytest + httpx) | **53** | Auth, business rules (amounts, type/category match, currency, budget uniqueness, protected deletes, fixed costs), living-costs and category-spending reports (no history, partial history, fixed vs variable, cushion edge cases), CSV escaping and formula injection, transaction filters and pagination, default categories, summary math, the demo seed |
+| Frontend (Vitest + Testing Library) | **131** | Month math, the `?month` URL param and day labels, the dashboard and report sentences, money formatting, API error messages, the theme logic, WCAG contrast of every design token in both themes, palette and status helpers, progress bar, pagination and segmented control |
 
 ```bash
 npm test             # both suites
@@ -215,9 +222,9 @@ npm run test:web     # frontend only
 ```
 .
 ├── backend/
-│   ├── alembic/versions/0001_baseline.py   # the single schema migration
+│   ├── alembic/versions/       # 0001 baseline, 0002 fixed-cost flag
 │   ├── app/
-│   │   ├── api/v1/routes/      # auth, categories, transactions, budgets, summary
+│   │   ├── api/v1/routes/      # auth, categories, transactions, budgets, summary, reports
 │   │   ├── core/               # settings, database engine, security, default categories
 │   │   ├── models/             # SQLAlchemy models
 │   │   ├── repositories/       # all database queries
@@ -230,20 +237,23 @@ npm run test:web     # frontend only
 ├── frontend/
 │   ├── src/
 │   │   ├── api/                # typed client, one module per resource
-│   │   ├── components/         # ui/, layout/, dashboard/, transactions/, categories/, budgets/
+│   │   ├── components/         # ui/, layout/, dashboard/, transactions/, categories/, budgets/, reports/
 │   │   ├── context/            # auth provider
-│   │   ├── hooks/              # useAsync, useMonth, useAuth
-│   │   ├── lib/                # money, dates, errors, colors, status helpers
-│   │   ├── pages/              # Dashboard, Transactions, Categories, Budgets, Auth
+│   │   ├── hooks/              # useAsync, useMonth, useAuth, useTheme
+│   │   ├── lib/                # money, dates, errors, colors, status, headline and report helpers
+│   │   ├── pages/              # Dashboard, Transactions, Categories, Budgets, Reports, Auth
 │   │   └── types/api.ts        # mirrors the backend schemas
 │   ├── Dockerfile
 │   └── nginx.conf
 ├── docs/screenshots/
+├── scripts/py.mjs              # finds backend/.venv or python3 for the npm scripts
 ├── docker-compose.yml
 └── package.json                # one-command scripts for the whole project
 ```
 
 ## Screenshots
+
+![Reports](docs/screenshots/reports.png)
 
 | | |
 |---|---|

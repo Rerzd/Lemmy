@@ -17,7 +17,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
     # Lets the browser read the pagination total sent by GET /transactions.
-    expose_headers=["X-Total-Count"],
+    # Content-Disposition carries the CSV export's file name.
+    expose_headers=["X-Total-Count", "Content-Disposition"],
 )
 
 app.include_router(router, prefix="/api/v1")

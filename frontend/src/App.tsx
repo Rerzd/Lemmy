@@ -9,6 +9,7 @@ const DashboardPage = lazy(() => import('./pages/Dashboard').then((m) => ({ defa
 const TransactionsPage = lazy(() => import('./pages/Transactions').then((m) => ({ default: m.TransactionsPage })))
 const CategoriesPage = lazy(() => import('./pages/Categories').then((m) => ({ default: m.CategoriesPage })))
 const BudgetsPage = lazy(() => import('./pages/Budgets').then((m) => ({ default: m.BudgetsPage })))
+const ReportsPage = lazy(() => import('./pages/Reports').then((m) => ({ default: m.ReportsPage })))
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/budgets" element={<BudgetsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
         </Route>
       </Route>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { Lock, Pencil, Plus, Trash2 } from 'lucide-react'
 import { deleteCategory, listCategories } from '../api/categories'
 import { getByCategory } from '../api/summary'
 import { CategoryModal } from '../components/categories/CategoryModal'
@@ -51,7 +51,15 @@ function CategoryRow({ category, activity, max, currency, onEdit, onDelete }: Ca
         <CategoryIcon icon={category.icon} color={category.color} />
         <span className="min-w-0 flex-1">
           <span className="flex items-baseline justify-between gap-3">
-            <span className="truncate text-sm font-medium text-text">{category.name}</span>
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="truncate text-sm font-medium text-text">{category.name}</span>
+              {category.is_fixed && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-chip bg-surface-2 px-1.5 py-0.5 text-xs text-text-muted">
+                  <Lock className="size-3" aria-hidden />
+                  Fixed
+                </span>
+              )}
+            </span>
             {activity && <span className="shrink-0 text-sm font-semibold text-text">{formatMoney(activity.total, currency)}</span>}
           </span>
           {activity ? (

@@ -10,6 +10,7 @@ const TransactionsPage = lazy(() => import('./pages/Transactions').then((m) => (
 const CategoriesPage = lazy(() => import('./pages/Categories').then((m) => ({ default: m.CategoriesPage })))
 const BudgetsPage = lazy(() => import('./pages/Budgets').then((m) => ({ default: m.BudgetsPage })))
 const ReportsPage = lazy(() => import('./pages/Reports').then((m) => ({ default: m.ReportsPage })))
+const CalculatorsPage = lazy(() => import('./pages/Calculators').then((m) => ({ default: m.CalculatorsPage })))
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/budgets" element={<BudgetsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/calculators" element={<CalculatorsPage />} />
         </Route>
       </Route>
 

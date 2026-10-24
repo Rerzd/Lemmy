@@ -20,15 +20,30 @@ interface BudgetModalProps {
   currency: string
   onClose: () => void
   onSaved: (created: boolean) => void
+  // Prefill for a new budget (e.g. from the groceries planner). It's only a starting
+  // point: the form still validates and the API still enforces one budget per category and month.
+  initialCategoryId?: number
+  initialAmount?: number
 }
 
 // Mounted only while open, so the form state always starts from the props.
-export function BudgetModal({ budget, available, period, currency, onClose, onSaved }: BudgetModalProps) {
+export function BudgetModal({
+  budget,
+  available,
+  period,
+  currency,
+  onClose,
+  onSaved,
+  initialCategoryId,
+  initialAmount,
+}: BudgetModalProps) {
   const formId = useId()
   const isEdit = budget !== null
 
-  const [categoryId, setCategoryId] = useState<number | ''>(available[0]?.id ?? '')
-  const [amount, setAmount] = useState(budget ? String(budget.budgeted) : '')
+  const [categoryId, setCategoryId] = useState<number | ''>(
+    available.find((c) => c.id === initialCategoryId)?.id ?? available[0]?.id ?? '',
+  )
+  const [amount, setAmount] = useState(budget ? String(budget.budgeted) : initialAmount !== undefined ? String(initialAmount) : '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 

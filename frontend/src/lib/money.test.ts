@@ -13,6 +13,12 @@ describe('formatMoney', () => {
     expect(formatMoney(1234.5, 'USD')).toBe('$1,234.50')
   })
 
+  it('formats the converter currencies in their own locale', () => {
+    expect(plain(formatMoney(984_682.49, 'CLP'))).toBe('$984.682')
+    expect(plain(formatMoney(1234.5, 'BRL'))).toBe('R$ 1.234,50')
+    expect(formatMoney(1234.5, 'GBP')).toBe('£1,234.50')
+  })
+
   it('supports a compact form', () => {
     expect(formatMoney(4_120_000, 'USD', { compact: true })).toBe('$4.1M')
     expect(formatMoney(8_000_000, 'USD', { compact: true })).toBe('$8M')
@@ -37,6 +43,8 @@ describe('roundMoney', () => {
   it('rounds to what the currency displays, half away from zero', () => {
     expect(currencyDecimals('COP')).toBe(0)
     expect(currencyDecimals('USD')).toBe(2)
+    expect(currencyDecimals('CLP')).toBe(0)
+    expect(roundMoney(984_682.493, 'CLP')).toBe(984_682)
     expect(roundMoney(1_083_333.3333, 'COP')).toBe(1_083_333)
     expect(roundMoney(346_666.5, 'COP')).toBe(346_667)
     expect(roundMoney(-2.5, 'COP')).toBe(-3)

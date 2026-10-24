@@ -5,7 +5,16 @@ const LOCALES: Record<string, string> = {
   USD: 'en-US',
   EUR: 'de-DE',
   MXN: 'es-MX',
+  GBP: 'en-GB',
+  CAD: 'en-CA',
+  BRL: 'pt-BR',
+  CLP: 'es-CL',
+  PEN: 'es-PE',
+  ARS: 'es-AR',
 }
+
+// Currencies that are never split into cents in everyday use.
+const WHOLE_UNITS = new Set(['COP', 'CLP'])
 
 const formatters = new Map<string, Intl.NumberFormat>()
 
@@ -16,10 +25,9 @@ function formatter(currency: string, compact: boolean): Intl.NumberFormat {
     f = new Intl.NumberFormat(LOCALES[currency] ?? 'en-US', {
       style: 'currency',
       currency,
-      // Pesos are never split into cents in everyday use.
       // Compact keeps one decimal so $1.8M doesn't read as $2M; pesos never show cents.
-      maximumFractionDigits: compact ? 1 : currency === 'COP' ? 0 : 2,
-      minimumFractionDigits: compact || currency === 'COP' ? 0 : undefined,
+      maximumFractionDigits: compact ? 1 : currencyDecimals(currency),
+      minimumFractionDigits: compact || WHOLE_UNITS.has(currency) ? 0 : undefined,
       notation: compact ? 'compact' : 'standard',
     })
     formatters.set(key, f)
@@ -40,9 +48,9 @@ export function formatPercent(value: number, digits = 1): string {
   return `${value.toFixed(digits)}%`
 }
 
-// Decimals each currency displays: pesos are never split into cents.
+// Decimals each currency displays: Colombian and Chilean pesos are never split into cents.
 export function currencyDecimals(currency: string): number {
-  return currency === 'COP' ? 0 : 2
+  return WHOLE_UNITS.has(currency) ? 0 : 2
 }
 
 /**

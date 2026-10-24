@@ -14,10 +14,11 @@ Lemmy records income and expenses by category, sets monthly budgets per category
 - **Transactions**: grouped by day, with the month's money in and out; filter by type, category and description search (debounced), all kept in the URL; server-side pagination; add, edit and delete with the backend's validation messages shown in the form.
 - **Categories**: income and expense side by side, each with this month's total, transaction count and a bar; 10 colors and 14 icons; 11 sensible defaults created on sign-up.
 - **Reports**: what it costs to live each month, opening with a sentence ("Living costs about $4,6 M a month. $2 M is fixed.") and how long savings would last; fixed and variable costs as two lists; this month vs the usual month per category; spending by month; CSV export of the month's transactions.
+- **Calculators**: planning tools that run entirely in the browser, each with live results and a one-line explanation of the math: a groceries planner (per month, week, person and day, plus eating out) that can compare the plan with a category's real spending and create a budget from it; a savings goal; compound interest with a yearly table; a loan payment with its French amortization schedule (effective annual rate converted to monthly correctly); and the 50/30/20 rule checked against the real month. The selected calculator lives in `?tool=`.
 - **Budgets**: monthly limit per expense category with spent, remaining, percent used and a status (on track, close to limit, over budget) shown with an icon and a label, never color alone. In the current month a tick on each bar marks an even pace, so it's clear which budgets are running ahead.
 - **Month navigation**: the selected month lives in `?month=YYYY-MM`, so every view can be bookmarked and shared.
 - **Light and dark themes**: follows the system by default, remembers a manual choice, and applies it before the first paint. Every text color meets WCAG AA in both themes (checked by a test).
-- **Responsive**: sidebar on desktop, bottom navigation on phones, and touch targets of at least 44 px on small screens.
+- **Responsive**: sidebar on desktop, bottom navigation on phones (Dashboard, Transactions, Budgets, Reports, plus a "More" menu for Categories and Calculators), and touch targets of at least 44 px on small screens.
 - **Demo account**: `demo@lemmy.app` / `demo1234`, one click from the login page.
 
 ## Tech stack
@@ -207,7 +208,7 @@ Lemmy uses a single SQLite file on purpose: there's no database server to instal
 | Suite | Tests | Covers |
 |---|---|---|
 | Backend (pytest + httpx) | **53** | Auth, business rules (amounts, type/category match, currency, budget uniqueness, protected deletes, fixed costs), living-costs and category-spending reports (no history, partial history, fixed vs variable, cushion edge cases), CSV escaping and formula injection, transaction filters and pagination, default categories, summary math, the demo seed |
-| Frontend (Vitest + Testing Library) | **131** | Month math, the `?month` URL param and day labels, the dashboard and report sentences, money formatting, API error messages, the theme logic, WCAG contrast of every design token in both themes, palette and status helpers, progress bar, pagination and segmented control |
+| Frontend (Vitest + Testing Library) | **177** | Month math, the `?month` URL param and day labels, the dashboard and report sentences, every calculator against reference values computed independently (e.g. a 10,000,000 loan at 24% EA over 12 months), input validation and rounding, the compare and create-budget flows, money formatting, API error messages, the theme logic, WCAG contrast of every design token in both themes, palette and status helpers, progress bar, pagination and segmented control |
 
 ```bash
 npm test             # both suites
@@ -237,11 +238,11 @@ npm run test:web     # frontend only
 ├── frontend/
 │   ├── src/
 │   │   ├── api/                # typed client, one module per resource
-│   │   ├── components/         # ui/, layout/, dashboard/, transactions/, categories/, budgets/, reports/
+│   │   ├── components/         # ui/, layout/, dashboard/, transactions/, categories/, budgets/, reports/, calculators/
 │   │   ├── context/            # auth provider
 │   │   ├── hooks/              # useAsync, useMonth, useAuth, useTheme
-│   │   ├── lib/                # money, dates, errors, colors, status, headline and report helpers
-│   │   ├── pages/              # Dashboard, Transactions, Categories, Budgets, Reports, Auth
+│   │   ├── lib/                # money, dates, errors, colors, status, headline and report helpers; calculators/ (pure math)
+│   │   ├── pages/              # Dashboard, Transactions, Categories, Budgets, Reports, Calculators, Auth
 │   │   └── types/api.ts        # mirrors the backend schemas
 │   ├── Dockerfile
 │   └── nginx.conf
@@ -254,6 +255,8 @@ npm run test:web     # frontend only
 ## Screenshots
 
 ![Reports](docs/screenshots/reports.png)
+
+![Calculators](docs/screenshots/calculators.png)
 
 | | |
 |---|---|

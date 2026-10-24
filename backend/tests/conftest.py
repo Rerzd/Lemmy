@@ -3,6 +3,7 @@ import os
 # Must be set before importing the app: settings and the engine are created at import time.
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["SECRET_KEY"] = "test-secret"
+os.environ["LEMMY_EXTERNAL_DATA"] = "on"
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,9 +11,11 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from app.core.config import settings
 from app.core.database import Base, get_db
 from app.main import app
 from app import models  # noqa: F401  (registers every table on Base.metadata)
+from app.services import external_http, external_service
 
 # StaticPool reuses one connection, so every session sees the same in-memory DB.
 engine = create_engine(
@@ -30,6 +33,21 @@ def _enable_foreign_keys(dbapi_connection, _):
 
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def _no_network(request, timeout):
+    raise AssertionError(f"A test tried to reach the network: {request.full_url}")
+
+
+@pytest.fixture(autouse=True)
+def no_real_network(monkeypatch):
+    # Every outgoing request goes through external_http._open; tests that need a source
+    # replace it with a fake. Anything else fails loudly instead of calling the internet.
+    monkeypatch.setattr(external_http, "_open", _no_network)
+    monkeypatch.setattr(settings, "LEMMY_EXTERNAL_DATA", True)
+    external_service.reset_state()
+    yield
+    external_service.reset_state()
 
 
 @pytest.fixture()

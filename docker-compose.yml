@@ -8,6 +8,8 @@ services:
       # Placeholder only; set a real value in your shell or a root .env file.
       SECRET_KEY: ${SECRET_KEY:-change-me}
       CORS_ORIGINS: http://localhost:8080
+      # "off" disables every outgoing request (TRM and exchange rates).
+      LEMMY_EXTERNAL_DATA: ${LEMMY_EXTERNAL_DATA:-on}
     ports:
       - "8000:8000"
     volumes:

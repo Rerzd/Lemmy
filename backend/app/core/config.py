@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     # Comma-separated list, e.g. "http://localhost:5173,http://127.0.0.1:5173"
     CORS_ORIGINS: str = "http://localhost:5173"
 
+    # External data (TRM and exchange rates). "off" (or false/0) makes the API skip every
+    # outgoing request; the endpoints then answer with status "off" instead of data.
+    LEMMY_EXTERNAL_DATA: bool = True
+
     model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", extra="ignore")
 
     @field_validator("DATABASE_URL")

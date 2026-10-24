@@ -7,6 +7,7 @@ import { listTransactions } from '../api/transactions'
 import { CategoryBars } from '../components/dashboard/CategoryBars'
 import { Headline } from '../components/dashboard/Headline'
 import { TrendChart } from '../components/dashboard/TrendChart'
+import { TrmCard } from '../components/external/TrmCard'
 import { TransactionItem } from '../components/transactions/TransactionItem'
 import { Card } from '../components/ui/Card'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -91,31 +92,35 @@ export function DashboardPage() {
           )}
         </Card>
 
-        <Card title="Recent transactions" action={<CardLink to={`/transactions${search}`}>View all</CardLink>} className="lg:col-span-2">
-          {recent.error ? (
-            <ErrorState message={recent.error} onRetry={recent.reload} />
-          ) : !recent.data ? (
-            <SkeletonRows rows={6} />
-          ) : recent.data.items.length === 0 ? (
-            <EmptyState
-              icon={Receipt}
-              title="No transactions this month"
-              description="Log income and expenses to see them here."
-              action={
-                <Link to={`/transactions${search}`} className={addLink}>
-                  <Plus className="size-4" aria-hidden />
-                  Add transaction
-                </Link>
-              }
-            />
-          ) : (
-            <div className="-my-1 divide-y divide-border">
-              {recent.data.items.map((t) => (
-                <TransactionItem key={t.id} transaction={t} category={categoryById.get(t.category_id)} />
-              ))}
-            </div>
-          )}
-        </Card>
+        {/* The dollar card loads on its own; nothing above waits for it. */}
+        <div className="space-y-4 sm:space-y-6 lg:col-span-2">
+          <TrmCard />
+          <Card title="Recent transactions" action={<CardLink to={`/transactions${search}`}>View all</CardLink>}>
+            {recent.error ? (
+              <ErrorState message={recent.error} onRetry={recent.reload} />
+            ) : !recent.data ? (
+              <SkeletonRows rows={6} />
+            ) : recent.data.items.length === 0 ? (
+              <EmptyState
+                icon={Receipt}
+                title="No transactions this month"
+                description="Log income and expenses to see them here."
+                action={
+                  <Link to={`/transactions${search}`} className={addLink}>
+                    <Plus className="size-4" aria-hidden />
+                    Add transaction
+                  </Link>
+                }
+              />
+            ) : (
+              <div className="-my-1 divide-y divide-border">
+                {recent.data.items.map((t) => (
+                  <TransactionItem key={t.id} transaction={t} category={categoryById.get(t.category_id)} />
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
       </div>
 
       {/* 3. The longer view */}

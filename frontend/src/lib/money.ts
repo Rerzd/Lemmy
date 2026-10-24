@@ -39,3 +39,19 @@ export function formatSigned(amount: number, currency: string, type: 'income' | 
 export function formatPercent(value: number, digits = 1): string {
   return `${value.toFixed(digits)}%`
 }
+
+// Decimals each currency displays: pesos are never split into cents.
+export function currencyDecimals(currency: string): number {
+  return currency === 'COP' ? 0 : 2
+}
+
+/**
+ * Rounds to what the currency displays, half away from zero. Calculators keep
+ * full precision and round only here, at the end. toPrecision(15) first drops
+ * float noise, so 1.005 (stored as 1.00499…) rounds to 1.01 as a person expects.
+ */
+export function roundMoney(value: number, currency: string): number {
+  const factor = 10 ** currencyDecimals(currency)
+  const scaled = Number((Math.abs(value) * factor).toPrecision(15))
+  return (Math.sign(value) * Math.round(scaled)) / factor || 0
+}

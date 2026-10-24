@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney, formatPercent, formatSigned } from './money'
+import { currencyDecimals, formatMoney, formatPercent, formatSigned, roundMoney } from './money'
 
 // Intl output uses non-breaking spaces; normalize so the expectations stay readable.
 const plain = (s: string) => s.replace(/[\u00a0\u202f]/g, ' ')
@@ -31,4 +31,20 @@ describe('formatSigned', () => {
 it('formatPercent rounds to the requested digits', () => {
   expect(formatPercent(12.345)).toBe('12.3%')
   expect(formatPercent(80, 0)).toBe('80%')
+})
+
+describe('roundMoney', () => {
+  it('rounds to what the currency displays, half away from zero', () => {
+    expect(currencyDecimals('COP')).toBe(0)
+    expect(currencyDecimals('USD')).toBe(2)
+    expect(roundMoney(1_083_333.3333, 'COP')).toBe(1_083_333)
+    expect(roundMoney(346_666.5, 'COP')).toBe(346_667)
+    expect(roundMoney(-2.5, 'COP')).toBe(-3)
+    expect(roundMoney(0.1 + 0.2, 'USD')).toBe(0.3)
+  })
+
+  it('ignores float noise like 1.005 stored as 1.00499...', () => {
+    expect(roundMoney(1.005, 'USD')).toBe(1.01)
+    expect(roundMoney(-0.0001, 'USD')).toBe(0)
+  })
 })

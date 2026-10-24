@@ -25,12 +25,12 @@ export function CompoundCalculator({ currency }: { currency: string }) {
   return (
     <CalculatorCard
       title="Compound interest"
-      explanation="each month the balance earns the yearly rate ÷ 12 and then the deposit is added (compounded monthly). Figures are rounded only when shown, and interest = balance − what you put in."
+      explanation="the yearly rate is an effective annual rate (EA), turned into its monthly equivalent ((1 + rate)^(1/12) − 1); each month the balance earns that and then the deposit is added. Figures are rounded only when shown, and interest = balance − what you put in."
       inputs={
         <div className="space-y-4">
           <NumberField label="Initial amount" field={initial} prefix={currency} optional />
           <NumberField label="Monthly contribution" field={monthly} prefix={currency} optional />
-          <NumberField label="Yearly interest rate" field={rate} suffix="%" placeholder="e.g. 10" hint="Nominal yearly rate, compounded monthly." />
+          <NumberField label="Yearly interest rate" field={rate} suffix="%" placeholder="e.g. 10" hint="Effective annual rate (EA), compounded monthly." />
           <NumberField label="Years" field={years} integer hint="Up to 50 years." />
         </div>
       }

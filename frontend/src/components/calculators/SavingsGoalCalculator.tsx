@@ -25,7 +25,7 @@ export function SavingsGoalCalculator({ currency }: { currency: string }) {
   return (
     <CalculatorCard
       title="Savings goal"
-      explanation="deposits at the end of each month, with the yearly return turned into its monthly equivalent ((1 + rate)^(1/12) − 1) and compounded. With a 0% return it's simply what's missing ÷ months."
+      explanation="deposits at the end of each month, with the yearly return, an effective annual rate (EA), turned into its monthly equivalent ((1 + rate)^(1/12) − 1) and compounded. With a 0% return it's simply what's missing ÷ months."
       inputs={
         <div className="space-y-4">
           <NumberField label="Target amount" field={target} prefix={currency} placeholder="e.g. 20000000" />

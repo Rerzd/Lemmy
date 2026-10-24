@@ -1,9 +1,10 @@
 import { roundMoney } from '../money'
+import { monthlyFromEffectiveAnnual } from './rates'
 
 export interface CompoundInput {
   initial: number
   monthly: number // deposited at the end of each month
-  yearlyRate: number // nominal yearly rate as a percent, compounded monthly (rate / 12 a month)
+  yearlyRate: number // effective annual rate (EA) as a percent, compounded monthly
   years: number
 }
 
@@ -22,12 +23,14 @@ export interface CompoundResult {
 }
 
 /**
- * Month-by-month growth: balance = balance·(1 + r) + deposit, with r = rate/12.
+ * Month-by-month growth: balance = balance·(1 + r) + deposit, where r is the monthly
+ * equivalent of the effective annual rate, (1 + EA)^(1/12) − 1 (the same as the savings goal),
+ * so twelve months of growth with no deposits give back exactly the yearly rate.
  * Values stay unrounded while compounding; each reported figure is rounded once,
  * and interest is balance − contributed after rounding so the three always add up.
  */
 export function growCompound(input: CompoundInput, currency: string): CompoundResult {
-  const r = input.yearlyRate / 100 / 12
+  const r = monthlyFromEffectiveAnnual(input.yearlyRate / 100)
   let balance = input.initial
   let contributed = input.initial
   const years: CompoundYear[] = []

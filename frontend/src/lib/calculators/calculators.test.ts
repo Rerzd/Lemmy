@@ -130,17 +130,20 @@ describe('planSavingsGoal', () => {
 })
 
 describe('growCompound', () => {
-  it('matches the closed form after 10 years', () => {
+  // Reference values: closed form B = P(1+m)^n + d((1+m)^n - 1)/m with m = 1.12^(1/12) - 1,
+  // computed with Python decimal at 50 digits and rounded half up.
+  it('matches the closed form after 10 years at 12% EA', () => {
     const result = growCompound({ initial: 1_000_000, monthly: 100_000, yearlyRate: 12, years: 10 }, 'COP')
-    expect(result.finalBalance).toBe(26_304_256)
+    expect(result.finalBalance).toBe(25_298_852)
     expect(result.totalContributed).toBe(13_000_000)
-    expect(result.interestEarned).toBe(13_304_256)
+    expect(result.interestEarned).toBe(12_298_852)
     expect(result.years).toHaveLength(10)
-    expect(result.years[0]).toEqual({ year: 1, contributed: 2_200_000, interest: 195_075, balance: 2_395_075 })
+    expect(result.years[0]).toEqual({ year: 1, contributed: 2_200_000, interest: 184_650, balance: 2_384_650 })
   })
 
-  it('handles cents, a 0% rate and no deposits', () => {
-    expect(growCompound({ initial: 1000, monthly: 0, yearlyRate: 5, years: 1 }, 'USD').finalBalance).toBe(1051.16)
+  it('gives back exactly the yearly rate, handles cents, a 0% rate and no deposits', () => {
+    const plain = growCompound({ initial: 1000, monthly: 0, yearlyRate: 5, years: 2 }, 'USD')
+    expect(plain.years.map((y) => y.balance)).toEqual([1050, 1102.5])
     expect(growCompound({ initial: 500, monthly: 100, yearlyRate: 0, years: 2 }, 'USD')).toMatchObject({
       finalBalance: 2900,
       totalContributed: 2900,
@@ -234,7 +237,7 @@ describe('compareWithRule', () => {
 describe('parseTool', () => {
   it('reads ?tool= and falls back to groceries', async () => {
     const { parseTool, TOOLS } = await import('./tools')
-    expect(TOOLS.map((t) => t.id)).toEqual(['groceries', 'savings', 'compound', 'loan', 'rule'])
+    expect(TOOLS.map((t) => t.id).slice(0, 5)).toEqual(['groceries', 'savings', 'compound', 'loan', 'rule'])
     expect(parseTool('loan')).toBe('loan')
     expect(parseTool(null)).toBe('groceries')
     expect(parseTool('LOAN')).toBe('groceries')

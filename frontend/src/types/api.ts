@@ -155,3 +155,40 @@ export interface CategorySpending {
   categories: (Omit<LivingCostCategory, 'this_month' | 'baseline' | 'change_pct'> & { totals: number[]; total: number })[]
   totals: number[]
 }
+
+// /external: every answer carries a status instead of failing. ok = fresh value;
+// stale = the source failed, this is the last good value; unavailable = nothing to show;
+// off = LEMMY_EXTERNAL_DATA is off on the server.
+export type ExternalState = 'ok' | 'stale' | 'unavailable' | 'off'
+
+export interface ExternalSource {
+  id: string
+  name: string
+  url: string
+  terms: string
+}
+
+export interface Trm {
+  status: ExternalState
+  date: string // YYYY-MM-DD, the day asked about
+  value: number | null // COP per US dollar
+  valid_from: string | null
+  valid_to: string | null
+  source: ExternalSource
+  fetched_at: string | null
+  age_seconds: number | null
+  stale: boolean
+  message: string | null
+}
+
+export interface Rates {
+  status: ExternalState
+  base: string
+  rates: Record<string, number> // units of each currency per 1 base
+  updated_at: string | null // when the source published them
+  source: ExternalSource
+  fetched_at: string | null
+  age_seconds: number | null
+  stale: boolean
+  message: string | null
+}

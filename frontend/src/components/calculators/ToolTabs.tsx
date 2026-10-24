@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent } from 'react'
+import { useEffect, useRef, type KeyboardEvent } from 'react'
 import { panelId, tabId, TOOLS, type ToolId } from '../../lib/calculators/tools'
 
 /**
@@ -8,6 +8,18 @@ import { panelId, tabId, TOOLS, type ToolId } from '../../lib/calculators/tools'
  */
 export function ToolTabs({ value, onChange }: { value: ToolId; onChange: (id: ToolId) => void }) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const rowRef = useRef<HTMLDivElement>(null)
+
+  // On phones the row scrolls sideways; keep the chosen tab inside it, also when the page
+  // opens on a deep link like ?tool=converter. Only the row scrolls, never the page.
+  useEffect(() => {
+    const row = rowRef.current
+    const tab = refs.current[value]
+    if (!row || !tab) return
+    const left = tab.offsetLeft - row.offsetLeft
+    if (left < row.scrollLeft) row.scrollLeft = left - 16
+    else if (left + tab.offsetWidth > row.scrollLeft + row.clientWidth) row.scrollLeft = left + tab.offsetWidth - row.clientWidth + 16
+  }, [value])
 
   const onKeyDown = (e: KeyboardEvent) => {
     const index = TOOLS.findIndex((t) => t.id === value)
@@ -23,14 +35,10 @@ export function ToolTabs({ value, onChange }: { value: ToolId; onChange: (id: To
     refs.current[TOOLS[next].id]?.focus()
   }
 
-  // On phones the row scrolls, so bring the chosen tab fully into view.
-  const select = (id: ToolId) => {
-    onChange(id)
-    refs.current[id]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-  }
+  const select = (id: ToolId) => onChange(id)
 
   return (
-    <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    <div ref={rowRef} className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <div role="tablist" aria-label="Calculators" onKeyDown={onKeyDown} className="inline-flex min-w-full gap-1 rounded-control border border-border bg-surface p-1 sm:min-w-0">
         {TOOLS.map((tool) => {
           const selected = tool.id === value

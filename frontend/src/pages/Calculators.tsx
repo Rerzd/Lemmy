@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { listCategories } from '../api/categories'
 import { CompoundCalculator } from '../components/calculators/CompoundCalculator'
+import { ConverterCalculator } from '../components/calculators/ConverterCalculator'
 import { GroceriesCalculator } from '../components/calculators/GroceriesCalculator'
 import { LoanCalculator } from '../components/calculators/LoanCalculator'
 import { RuleCalculator } from '../components/calculators/RuleCalculator'
@@ -51,7 +52,7 @@ export function CalculatorsPage() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <p className="text-sm text-text-muted">
-        Plan ahead with quick estimates. Everything is calculated in your browser and nothing is saved.
+        Plan ahead with quick estimates. Everything is calculated in your browser and nothing is saved; only the converter fetches exchange rates, through Lemmy's server.
       </p>
       <ToolTabs value={tool} onChange={select} />
       {panel('groceries', <GroceriesCalculator currency={currency} period={period} search={search} categories={categories.data} />)}
@@ -59,6 +60,7 @@ export function CalculatorsPage() {
       {panel('compound', <CompoundCalculator currency={currency} />)}
       {panel('loan', <LoanCalculator currency={currency} />)}
       {panel('rule', <RuleCalculator currency={currency} period={period} />)}
+      {panel('converter', <ConverterCalculator currency={currency} active={tool === 'converter'} />)}
     </div>
   )
 }

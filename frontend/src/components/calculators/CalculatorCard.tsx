@@ -4,7 +4,7 @@ import { Calculator } from 'lucide-react'
 interface CalculatorCardProps {
   title: string
   // One line on how the number is computed.
-  explanation: string
+  explanation: ReactNode
   inputs: ReactNode
   results: ReactNode
   footer?: ReactNode

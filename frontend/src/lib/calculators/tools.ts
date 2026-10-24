@@ -5,6 +5,7 @@ export const TOOLS = [
   { id: 'compound', label: 'Compound interest' },
   { id: 'loan', label: 'Loan' },
   { id: 'rule', label: '50/30/20' },
+  { id: 'converter', label: 'Currency converter' },
 ] as const
 
 export type ToolId = (typeof TOOLS)[number]['id']
